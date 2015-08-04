@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Annotation Time Series &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="Behavioral Epoch Module" href="zbeh.html" />
+    <link rel="prev" title="Abstract Feature Time Series" href="zabs.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zbeh.html" title="Behavioral Epoch Module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zabs.html" title="Abstract Feature Time Series"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="annotation-time-series">
+<h1>Annotation Time Series<a class="headerlink" href="#annotation-time-series" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">nwb</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Create and store experiment annotations</span>
+
+<span class="sd">Annotations are text strings that mark specific times in an </span>
+<span class="sd">experiment, for example &quot;rat placed in enclosure&quot; or &quot;observed</span>
+<span class="sd">start of seizure activity&quot;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create a new NWB file</span>
+<span class="c"># several settings are specified when doing so. these can be supplied within</span>
+<span class="c">#   the NWB constructor or defined in a dict, as in in this example</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;sample_annotations.nwb&quot;</span>
+
+<span class="c"># each file should have a descriptive globally unique identifier </span>
+<span class="c">#   that specifies the lab and this experiment session</span>
+<span class="c"># the function nwb.create_identifier() is recommended to use as it takes</span>
+<span class="c">#   the string and appends the present date and time</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">create_identifier</span><span class="p">(</span><span class="s">&quot;annotation example&quot;</span><span class="p">)</span>
+
+<span class="c"># indicate that it&#39;s OK to overwrite exting file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;overwrite&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># specify the start time of the experiment. all times in the NWB file</span>
+<span class="c">#   are relative to experiment start time</span>
+<span class="c"># if the start time is not specified the present time will be used</span>
+
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Sat Jul 04 2015 3:14:16&quot;</span>
+<span class="c"># provide one or two sentences that describe the experiment and what</span>
+<span class="c">#   data is in the file</span>
+
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Test file demonstrating use of the AbstractFeatureSeries&quot;</span>
+
+<span class="c"># create the NWB object. this manages the file</span>
+<span class="k">print</span> <span class="s">&quot;Creating &quot;</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span>
+<span class="n">neurodata</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">NWB</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create an AnnotationSeries</span>
+<span class="c"># this will be stored in &#39;acquisiiton&#39; as annotations are an</span>
+<span class="c">#   observation or a record of something else that happened.</span>
+<span class="c"># this means that it will be stored in the following location in the hdf5</span>
+<span class="c">#   file: acquisition/timeseries</span>
+<span class="n">annot</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;AnnotationSeries&quot;</span><span class="p">,</span> <span class="s">&quot;notes&quot;</span><span class="p">,</span> <span class="s">&quot;acquisition&quot;</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;This is an AnnotationSeries with sample data&quot;</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">set_comment</span><span class="p">(</span><span class="s">&quot;The comment and description fields can store arbitrary human-readable data&quot;</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="s">&quot;Observation of Dr. J Doe&quot;</span><span class="p">)</span>
+
+<span class="c"># store pretend data</span>
+<span class="c"># all time is stored as seconds</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat in bed, beginning sleep 1&quot;</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat placed in enclosure, start run 1&quot;</span><span class="p">,</span> <span class="mf">933.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat taken out of enclosure, end run 1&quot;</span><span class="p">,</span> <span class="mf">1456.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat in bed, start sleep 2&quot;</span><span class="p">,</span> <span class="mf">1461.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat placed in enclosure, start run 2&quot;</span><span class="p">,</span> <span class="mf">2401.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat taken out of enclosure, end run 2&quot;</span><span class="p">,</span> <span class="mf">3210.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;Rat in bed, start sleep 3&quot;</span><span class="p">,</span> <span class="mf">3218.0</span><span class="p">)</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="s">&quot;End sleep 3&quot;</span><span class="p">,</span> <span class="mf">4193.0</span><span class="p">)</span>
+
+<span class="c"># the time series must be finalized to be complete. this writes changes</span>
+<span class="c">#   to disk and allows freeing some memory resources</span>
+<span class="n">annot</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># it can sometimes be useful to import documenting data from a file</span>
+<span class="c"># in this case, we&#39;ll store this script in the metadata section of the</span>
+<span class="c">#   file, for a record of how the file was created</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata_from_file</span><span class="p">(</span><span class="s">&quot;source_script&quot;</span><span class="p">,</span> <span class="n">__file__</span><span class="p">)</span>
+
+<span class="c"># when all data is entered, close the file</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zabs.html"
+                        title="previous chapter">Abstract Feature Time Series</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zbeh.html"
+                        title="next chapter">Behavioral Epoch Module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/zann.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zbeh.html" title="Behavioral Epoch Module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zabs.html" title="Abstract Feature Time Series"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

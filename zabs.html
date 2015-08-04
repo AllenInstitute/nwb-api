@@ -1,0 +1,201 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Abstract Feature Time Series &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="Annotation Time Series" href="zann.html" />
+    <link rel="prev" title="Metadata constants and helper functions" href="nwbco.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zann.html" title="Annotation Time Series"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nwbco.html" title="Metadata constants and helper functions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="abstract-feature-time-series">
+<h1>Abstract Feature Time Series<a class="headerlink" href="#abstract-feature-time-series" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nwb</span>
+
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Store the Salient Features of a Drifting Gratings Visual Stimulus</span>
+
+<span class="sd">This example demonstrates how to use an AbstractFeatureSeries to store</span>
+<span class="sd">data that can be summarized by certain high-level features, such as the </span>
+<span class="sd">salient features of a visual stimulus. The standard example of this is </span>
+<span class="sd">for drifting gratings -- the spatial frequency, orientation, phase, </span>
+<span class="sd">contrast and temporal frequency are the most important characteristics </span>
+<span class="sd">for analysis using drifting gratings, not necessarily the stack of all </span>
+<span class="sd">frames displayed by the graphics card.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create a new NWB file</span>
+<span class="c"># several settings are specified when doing so. these can be supplied within</span>
+<span class="c">#   the NWB constructor or defined in a dict, as in in this example</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;sample_abstract_features.nwb&quot;</span>
+
+<span class="c"># each file should have a descriptive globally unique identifier </span>
+<span class="c">#   that specifies the lab and this experiment session</span>
+<span class="c"># the function nwb.create_identifier() is recommended to use as it takes</span>
+<span class="c">#   the string and appends the present date and time</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">create_identifier</span><span class="p">(</span><span class="s">&quot;abstract-feature example&quot;</span><span class="p">)</span>
+
+<span class="c"># indicate that it&#39;s OK to overwrite exting file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;overwrite&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># specify the start time of the experiment. all times in the NWB file</span>
+<span class="c">#   are relative to experiment start time</span>
+<span class="c"># if the start time is not specified the present time will be used</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Sat Jul 04 2015 3:14:16&quot;</span>
+
+<span class="c"># provide one or two sentences that describe the experiment and what</span>
+<span class="c">#   data is in the file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Test file demonstrating use of the AbstractFeatureSeries&quot;</span>
+
+<span class="c"># create the NWB object. this manages the file</span>
+<span class="k">print</span> <span class="s">&quot;Creating &quot;</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span>
+<span class="n">neurodata</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">NWB</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create an AbstractFeatureSeries</span>
+<span class="c"># this will be stored as a &#39;stimulus&#39; in this example for this example. that</span>
+<span class="c">#   means that it will be stored in the following location in the hdf5</span>
+<span class="c">#   file: stimulus/presentation/</span>
+<span class="n">abstract</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;AbstractFeatureSeries&quot;</span><span class="p">,</span> <span class="s">&quot;my_drifting_grating_features&quot;</span><span class="p">,</span> <span class="s">&quot;stimulus&quot;</span><span class="p">)</span>
+<span class="n">abstract</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;This is a simulated visual stimulus that presents a moving grating&quot;</span><span class="p">)</span>
+
+<span class="c"># an AbstractFeatureSeries is an instance of a TimeSeries, with addition</span>
+<span class="c">#   of the following fields:</span>
+<span class="c">#       features -- describes the abstract features</span>
+<span class="c">#       feature_units -- the units that these features are measured in</span>
+<span class="c"># define the abstract features that we&#39;re storing, as well as the units</span>
+<span class="c">#   of those features (any number of features can be specified)</span>
+<span class="n">features</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;orientation&quot;</span><span class="p">,</span> <span class="s">&quot;spatial frequency&quot;</span><span class="p">,</span> <span class="s">&quot;phase&quot;</span><span class="p">,</span> <span class="s">&quot;temporal frequency&quot;</span><span class="p">]</span>
+<span class="n">units</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;degrees&quot;</span><span class="p">,</span> <span class="s">&quot;Hz&quot;</span><span class="p">,</span> <span class="s">&quot;radians&quot;</span><span class="p">,</span> <span class="s">&quot;degrees&quot;</span><span class="p">]</span>
+<span class="c"># store them</span>
+<span class="n">abstract</span><span class="o">.</span><span class="n">set_features</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+
+<span class="n">abstract</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="s">&quot;Simulated data. Normally this would be the device presenting stimulus&quot;</span><span class="p">)</span>
+
+<span class="c"># create some pretend data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4000</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="c"># add data to the time series. for now, ignore the last 3 parameters</span>
+<span class="n">abstract</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.001</span>
+<span class="n">abstract</span><span class="o">.</span><span class="n">set_time</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="c"># the time series must be finalized to be complete. this writes changes</span>
+<span class="c">#   to disk and allows freeing some memory resources</span>
+<span class="n">abstract</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># it can sometimes be useful to import documenting data from a file</span>
+<span class="c"># in this case, we&#39;ll store this script in the metadata section of the</span>
+<span class="c">#   file, for a record of how the file was created</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata_from_file</span><span class="p">(</span><span class="s">&quot;source_script&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c"># when all data is entered, close the file</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nwbco.html"
+                        title="previous chapter">Metadata constants and helper functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zann.html"
+                        title="next chapter">Annotation Time Series</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/zabs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zann.html" title="Annotation Time Series"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nwbco.html" title="Metadata constants and helper functions"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

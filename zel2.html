@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Extracellular ephys example storing spike events &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Extracellular ephys example" href="zel1.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zel1.html" title="Extracellular ephys example"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="extracellular-ephys-example-storing-spike-events">
+<h1>Extracellular ephys example storing spike events<a class="headerlink" href="#extracellular-ephys-example-storing-spike-events" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">nwb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">nwb.nwbco</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Store extracellular ephys data</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create a new NWB file</span>
+<span class="c"># several settings are specified when doing so. these can be supplied within</span>
+<span class="c">#   the NWB constructor or defined in a dict, as in in this example</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;sample_extracellular_spikes.nwb&quot;</span>
+
+<span class="c"># each file should have a descriptive globally unique identifier </span>
+<span class="c">#   that specifies the lab and this experiment session</span>
+<span class="c"># the function nwb.create_identifier() is recommended to use as it takes</span>
+<span class="c">#   the string and appends the present date and time</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">create_identifier</span><span class="p">(</span><span class="s">&quot;extracellular spikes example&quot;</span><span class="p">)</span>
+
+<span class="c"># indicate that it&#39;s OK to overwrite exting file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;overwrite&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># specify the start time of the experiment. all times in the NWB file</span>
+<span class="c">#   are relative to experiment start time</span>
+<span class="c"># if the start time is not specified the present time will be used</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Sat Jul 04 2015 3:14:16&quot;</span>
+
+<span class="c"># provide one or two sentences that describe the experiment and what</span>
+<span class="c">#   data is in the file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Test file demonstrating a simple extracellular ephys recording&quot;</span>
+
+<span class="c"># create the NWB object. this manages the file</span>
+<span class="k">print</span> <span class="s">&quot;Creating &quot;</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span>
+<span class="n">neurodata</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">NWB</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create two electrical series, one with a single electrode and one with many</span>
+<span class="c"># then create a spike event series</span>
+
+<span class="c"># first create the electrode map</span>
+<span class="c"># example simulated recording is made from two 2-electrode probes named</span>
+<span class="c">#   &#39;p0&#39; and &#39;p1&#39;. we need to define the locations of the electrodes</span>
+<span class="c">#   relative to each probe, and the location of the probes</span>
+<span class="c"># electrode coordinates are in meters and their positions </span>
+<span class="c">#   are relative to each other. the location of the probe itself is</span>
+<span class="c">#   stored separately. using absolute coordinates here, if they are known, </span>
+<span class="c">#   is still OK</span>
+<span class="n">electrode_map</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5e-6</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.0e-5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="n">electrode_group</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;p0&quot;</span><span class="p">,</span> <span class="s">&quot;p0&quot;</span><span class="p">,</span> <span class="s">&quot;p1&quot;</span><span class="p">,</span> <span class="s">&quot;p1&quot;</span> <span class="p">]</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">EXTRA_ELECTRODE_MAP</span><span class="p">,</span> <span class="n">electrode_map</span><span class="p">)</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">EXTRA_ELECTRODE_GROUP</span><span class="p">,</span> <span class="n">electrode_group</span><span class="p">)</span>
+<span class="c"># set electrode impedances</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">EXTRA_IMPEDANCE</span><span class="p">,</span> <span class="p">[</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1.1e6</span><span class="p">,</span> <span class="mf">1.2e6</span><span class="p">,</span> <span class="mf">1.3e6</span> <span class="p">])</span>
+
+<span class="c"># define the placement of each probe</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">EXTRA_SHANK_LOCATION</span><span class="p">(</span><span class="s">&quot;p0&quot;</span><span class="p">),</span> <span class="s">&quot;CA1, left hemisphere, stereotactic coordinates xx, yy&quot;</span><span class="p">)</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">EXTRA_SHANK_LOCATION</span><span class="p">(</span><span class="s">&quot;p1&quot;</span><span class="p">),</span> <span class="s">&quot;CA3, left hemisphere, stereotactic coordinates xx, yy&quot;</span><span class="p">)</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># the example is of two 2-electrode probes. the electrode data from these</span>
+<span class="c">#   probes can be stored individually, grouped as probes (eg, 2-electrode</span>
+<span class="c">#   pair) or all stored together. these approaches are all exampled here </span>
+
+<span class="c"># create time series with all electrode data stored together</span>
+<span class="n">quad</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;ElectricalSeries&quot;</span><span class="p">,</span> <span class="s">&quot;quad&quot;</span><span class="p">,</span> <span class="s">&quot;acquisition&quot;</span><span class="p">)</span>
+<span class="n">quad</span><span class="o">.</span><span class="n">set_comment</span><span class="p">(</span><span class="s">&quot;Data corresponds to four electrodes (two probes)&quot;</span><span class="p">)</span>
+<span class="n">quad</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+<span class="n">quad</span><span class="o">.</span><span class="n">set_time</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0001</span><span class="p">)</span>
+<span class="c"># indicate that we&#39;re recording from the first electrode defined in the</span>
+<span class="c">#   above map (electrode numbers start at zero, so electrodes are </span>
+<span class="c">#   0, 1, 2 and 3</span>
+<span class="n">quad</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;electrode_idx&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="c"># finish the time series and write data to disk</span>
+<span class="n">quad</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># spikes can be reported by hardware or be detected by software</span>
+<span class="c"># in both cases, they are considered to be processed data and so belong</span>
+<span class="c">#   in a processing module</span>
+
+<span class="c"># create the module</span>
+<span class="n">spike_mod</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s">&quot;my spikes&quot;</span><span class="p">)</span>
+
+<span class="c"># create an interface that stores the events. here they will be stored</span>
+<span class="c">#   with their waveforms, such as would be the input to a spike-sorting</span>
+<span class="c">#   algorithm</span>
+<span class="n">spike_iface</span> <span class="o">=</span> <span class="n">spike_mod</span><span class="o">.</span><span class="n">create_interface</span><span class="p">(</span><span class="s">&quot;EventWaveform&quot;</span><span class="p">)</span>
+<span class="n">spike_iface</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="s">&quot;Data from device FooBar-X1 using dynamic multi-phasic threshold of 5xRMS&quot;</span><span class="p">)</span>
+
+<span class="c"># the event waveform interface publishes a SpikeEventSeries. make </span>
+<span class="c">#   that series</span>
+<span class="n">spike</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;SpikeEventSeries&quot;</span><span class="p">,</span> <span class="s">&quot;my waveforms&quot;</span><span class="p">)</span>
+<span class="n">spike</span><span class="o">.</span><span class="n">set_comment</span><span class="p">(</span><span class="s">&quot;Snapshots of spike events pulled from a recording&quot;</span><span class="p">)</span>
+<span class="n">spike</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;electrode_idx&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>    <span class="c"># probe &#39;p1&#39;</span>
+<span class="c"># describe the source of the data (may be redundant w/ interface source)</span>
+<span class="n">spike</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;source&quot;</span><span class="p">,</span> <span class="s">&quot;Data from device FooBar-X1 using dynamic multi-phasic threshold of 5xRMS&quot;</span><span class="p">)</span>
+<span class="c"># make some bogus simulated data</span>
+<span class="c"># this is 20 events all having the same shape and a pseudorandom time</span>
+<span class="n">evt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">evt</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">evt</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.005</span>
+<span class="n">evt</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="n">evt</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.0025</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">t</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">last</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="n">last</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">%</span> <span class="mi">29</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
+<span class="c"># </span>
+<span class="n">spike</span><span class="o">.</span><span class="n">set_time</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">spike</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c"># if data were stored in another unit such as microvolts, it would be</span>
+<span class="c">#   necessary to specify a converstion between that unit and Volts.</span>
+<span class="c">#   that would be done using the following:</span>
+<span class="c">#spike.set_data(data, conversion=1.0e-6)</span>
+
+<span class="c"># add the time series to the interface. the interface will manage </span>
+<span class="c">#   finalizing the time series</span>
+<span class="n">spike_iface</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">spike</span><span class="p">)</span>
+
+<span class="c"># now close the interface and its parent module</span>
+<span class="n">spike_iface</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+<span class="n">spike_mod</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c"># close file, otherwise it will fail to write properly</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zel1.html"
+                        title="previous chapter">Extracellular ephys example</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/zel2.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zel1.html" title="Extracellular ephys example"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

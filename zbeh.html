@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Behavioral Epoch Module &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="MotionCorrection Interface" href="zcor.html" />
+    <link rel="prev" title="Annotation Time Series" href="zann.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zcor.html" title="MotionCorrection Interface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zann.html" title="Annotation Time Series"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="behavioral-epoch-module">
+<h1>Behavioral Epoch Module<a class="headerlink" href="#behavioral-epoch-module" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">nwb</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Create a module that stores experimental intervals</span>
+
+<span class="sd">Modules represent intermediate processing of experimental data,</span>
+<span class="sd">something that must be done to the acquired data before it is </span>
+<span class="sd">ready for experimental analysis. Processing examples are spike </span>
+<span class="sd">clustering (ephys) and image segmentation (ophys). </span>
+
+<span class="sd">In this example, a processing module is created that stores </span>
+<span class="sd">intervals marking a particular behavior, and it is assumed that</span>
+<span class="sd">this behavior is only determinable by post-processing of acquired</span>
+<span class="sd">data.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create a new NWB file</span>
+<span class="c"># several settings are specified when doing so. these can be supplied within</span>
+<span class="c">#   the NWB constructor or defined in a dict, as in in this example</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;sample_behavior.nwb&quot;</span>
+
+<span class="c"># each file should have a descriptive globally unique identifier </span>
+<span class="c">#   that specifies the lab and this experiment session</span>
+<span class="c"># the function nwb.create_identifier() is recommended to use as it takes</span>
+<span class="c">#   the string and appends the present date and time</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">create_identifier</span><span class="p">(</span><span class="s">&quot;behavioral interval example&quot;</span><span class="p">)</span>
+
+<span class="c"># indicate that it&#39;s OK to overwrite exting file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;overwrite&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># specify the start time of the experiment. all times in the NWB file</span>
+<span class="c">#   are relative to experiment start time</span>
+<span class="c"># if the start time is not specified the present time will be used</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Sat Jul 04 2015 3:14:16&quot;</span>
+
+<span class="c"># provide one or two sentences that describe the experiment and what</span>
+<span class="c">#   data is in the file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Test file demonstrating use of the BehavioralEpochs module interface&quot;</span>
+
+<span class="c"># create the NWB object. this manages the file</span>
+<span class="k">print</span> <span class="s">&quot;Creating &quot;</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span>
+<span class="n">neurodata</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">NWB</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+
+<span class="c">########################################################################</span>
+<span class="c"># processed information is stored in modules, with each module publishing</span>
+<span class="c">#   one or more &#39;interfaces&#39;. an interface is like a contract, promising</span>
+<span class="c">#   that the module will provide a specific and defined set of data.</span>
+<span class="c"># this module will publish &#39;BehavioralEpochs&#39; interface, which promises</span>
+<span class="c">#   that it will publish IntervalSeries (a type of time series storing</span>
+<span class="c">#   experimental intervals)</span>
+<span class="c">#</span>
+<span class="c"># create the module</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s">&quot;my behavioral module&quot;</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;sample module that stores behavioral interval data&quot;</span><span class="p">)</span>
+
+<span class="c"># add an interface</span>
+<span class="n">iface_1</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">create_interface</span><span class="p">(</span><span class="s">&quot;BehavioralEpochs&quot;</span><span class="p">)</span>
+<span class="n">iface_1</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="s">&quot;a description of the original data that these intervals were calculated from &quot;</span><span class="p">)</span>
+
+<span class="c"># interval data is stored in an interval time series -- IntervalSeries</span>
+<span class="c"># create it</span>
+<span class="n">interval</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;IntervalSeries&quot;</span><span class="p">,</span> <span class="s">&quot;intervals&quot;</span><span class="p">)</span>
+<span class="n">interval</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;Sample interval series -- two series are overlaid here, one with a code &#39;1&#39; and another with the code &#39;2&#39;&quot;</span><span class="p">)</span>
+<span class="n">interval</span><span class="o">.</span><span class="n">set_comment</span><span class="p">(</span><span class="s">&quot;For example, &#39;1&#39; represents sound on(+1)/off(-1) and &#39;2&#39; represents light on(+2)/off(-2)&quot;</span><span class="p">)</span>
+
+<span class="c"># create </span>
+<span class="n">evts</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span> <span class="p">]</span>
+<span class="n">interval</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">evts</span><span class="p">)</span>
+
+<span class="c"># note: some timestamps will be duplicated if two different events start </span>
+<span class="c">#   and/or stop at the same time</span>
+<span class="n">t</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span> <span class="p">]</span>
+<span class="n">interval</span><span class="o">.</span><span class="n">set_time</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="c"># add the time series to the module interface. the interface will manage</span>
+<span class="c">#   storing the time series in the file. it will be stored in the hdf5</span>
+<span class="c">#   location: processing/my behavioral module/BehavioralEpoch/</span>
+<span class="n">iface_1</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+
+<span class="c"># finalize the interface -- this writes pending data to disk and allows</span>
+<span class="c">#   freeing of resources</span>
+<span class="n">iface_1</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c"># multiple interfaces can be added to a module, and multiple time series</span>
+<span class="c">#   can be added to an interface using the same approach. this example</span>
+<span class="c">#   only imports one</span>
+
+<span class="c"># once all interfaces are added to the module and finalized, finish off</span>
+<span class="c">#   the module itself</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># it can sometimes be useful to import documenting data from a file</span>
+<span class="c"># in this case, we&#39;ll store this script in the metadata section of the</span>
+<span class="c">#   file, for a record of how the file was created</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata_from_file</span><span class="p">(</span><span class="s">&quot;source_script&quot;</span><span class="p">,</span> <span class="n">__file__</span><span class="p">)</span>
+
+<span class="c"># when all data is entered, close the file</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zann.html"
+                        title="previous chapter">Annotation Time Series</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zcor.html"
+                        title="next chapter">MotionCorrection Interface</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/zbeh.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zcor.html" title="MotionCorrection Interface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zann.html" title="Annotation Time Series"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
