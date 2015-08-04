@@ -1,1 +1,0 @@
-../ainwb/docs/searchindex.js
