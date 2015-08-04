@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Metadata constants and helper functions &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="Abstract Feature Time Series" href="zabs.html" />
+    <link rel="prev" title="Epoch management" href="api_ep.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zabs.html" title="Abstract Feature Time Series"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api_ep.html" title="Epoch management"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="metadata-constants-and-helper-functions">
+<h1>Metadata constants and helper functions<a class="headerlink" href="#metadata-constants-and-helper-functions" title="Permalink to this headline">¶</a></h1>
+<p>This file defines shortcuts useful for storing experiment-level
+metadata. For more information about each field, and the organization
+of fields in the NWB file, please see the &#8216;general&#8217; section in the
+<a class="reference download internal" href="_downloads/neurodata_spec.1.01.pdf"><tt class="xref download docutils literal"><span class="pre">NWB</span> <span class="pre">file</span> <span class="pre">format</span> <span class="pre">specification</span></tt></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2015 Allen Institute, California Institute of Technology, </span>
+<span class="sd">New York University School of Medicine, the Howard Hughes Medical </span>
+<span class="sd">Institute, University of California, Berkeley, GE, the Kavli Foundation </span>
+<span class="sd">and the International Neuroinformatics Coordinating Facility. </span>
+<span class="sd">All rights reserved.</span>
+<span class="sd">    </span>
+<span class="sd">Redistribution and use in source and binary forms, with or without </span>
+<span class="sd">modification, are permitted provided that the following </span>
+<span class="sd">conditions are met:</span>
+<span class="sd">    </span>
+<span class="sd">1.  Redistributions of source code must retain the above copyright </span>
+<span class="sd">    notice, this list of conditions and the following disclaimer.</span>
+<span class="sd">    </span>
+<span class="sd">2.  Redistributions in binary form must reproduce the above copyright </span>
+<span class="sd">    notice, this list of conditions and the following disclaimer in </span>
+<span class="sd">    the documentation and/or other materials provided with the distribution.</span>
+<span class="sd">    </span>
+<span class="sd">3.  Neither the name of the copyright holder nor the names of its </span>
+<span class="sd">    contributors may be used to endorse or promote products derived </span>
+<span class="sd">    from this software without specific prior written permission.</span>
+<span class="sd">    </span>
+<span class="sd">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS </span>
+<span class="sd">&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT </span>
+<span class="sd">LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS </span>
+<span class="sd">FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE </span>
+<span class="sd">COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, </span>
+<span class="sd">INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, </span>
+<span class="sd">BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; </span>
+<span class="sd">LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER </span>
+<span class="sd">CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT </span>
+<span class="sd">LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN </span>
+<span class="sd">ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE </span>
+<span class="sd">POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># metadata storage constants</span>
+<span class="c"># these are so users don&#39;t have to remember exact path to</span>
+<span class="c">#   meatadata fields, and to avoid/detect typos</span>
+<span class="c"># all constants here are for storing data in the files top-level</span>
+<span class="c">#   group &#39;general&#39;</span>
+<span class="c">#</span>
+<span class="c"># some are string constants and others are functions that</span>
+<span class="c">#   return strings. functions are used when there&#39;s a variable</span>
+<span class="c">#   element in metadata storage path</span>
+
+<span class="n">DATA_COLLECTION</span> <span class="o">=</span> <span class="s">&quot;data_collection&quot;</span>
+<span class="n">EXPERIMENT_DESCRIPTION</span> <span class="o">=</span> <span class="s">&quot;experiment_description&quot;</span>
+<span class="n">EXPERIMENTER</span> <span class="o">=</span> <span class="s">&quot;experimenter&quot;</span>
+<span class="n">INSTITUTION</span> <span class="o">=</span> <span class="s">&quot;institution&quot;</span>
+<span class="n">LAB</span> <span class="o">=</span> <span class="s">&quot;lab&quot;</span>
+<span class="n">NOTES</span> <span class="o">=</span> <span class="s">&quot;notes&quot;</span>
+<span class="n">PROTOCOL</span> <span class="o">=</span> <span class="s">&quot;protocol&quot;</span>
+<span class="n">PHARMACOLOGY</span> <span class="o">=</span> <span class="s">&quot;pharmacology&quot;</span>
+<span class="n">RELATED_PUBLICATIONS</span> <span class="o">=</span> <span class="s">&quot;related_publications&quot;</span>
+<span class="n">SESSION_ID</span> <span class="o">=</span> <span class="s">&quot;session_id&quot;</span>
+<span class="n">SLICES</span> <span class="o">=</span> <span class="s">&quot;slices&quot;</span>
+<span class="n">STIMULUS</span> <span class="o">=</span> <span class="s">&quot;stimulus&quot;</span>
+<span class="n">SURGERY</span> <span class="o">=</span> <span class="s">&quot;surgery&quot;</span>
+<span class="n">VIRUS</span> <span class="o">=</span> <span class="s">&quot;virus&quot;</span>
+
+<span class="n">SUBJECT</span> <span class="o">=</span> <span class="s">&quot;subject/description&quot;</span>
+<span class="n">SUBJECT_ID</span> <span class="o">=</span> <span class="s">&quot;subject/subject_id&quot;</span>
+<span class="n">SPECIES</span> <span class="o">=</span> <span class="s">&quot;subject/species&quot;</span>
+<span class="n">GENOTYPE</span> <span class="o">=</span> <span class="s">&quot;subject/genotype&quot;</span>
+<span class="n">SEX</span> <span class="o">=</span> <span class="s">&quot;subject/sex&quot;</span>
+<span class="n">AGE</span> <span class="o">=</span> <span class="s">&quot;subject/age&quot;</span>
+<span class="n">WEIGHT</span> <span class="o">=</span> <span class="s">&quot;subject/weight&quot;</span>
+
+<span class="k">def</span> <span class="nf">DEVICE</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;devices/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># for extra-cellular ephys recordings</span>
+
+<span class="n">EXTRA_ELECTRODE_MAP</span> <span class="o">=</span> <span class="s">&quot;extracellular_ephys/electrode_map&quot;</span>
+<span class="n">EXTRA_ELECTRODE_GROUP</span> <span class="o">=</span> <span class="s">&quot;extracellular_ephys/electrode_group&quot;</span>
+<span class="n">EXTRA_IMPEDANCE</span> <span class="o">=</span> <span class="s">&quot;extracellular_ephys/impedance&quot;</span>
+<span class="n">EXTRA_FILTERING</span> <span class="o">=</span> <span class="s">&quot;extracellular_ephys/filtering&quot;</span>
+
+<span class="k">def</span> <span class="nf">EXTRA_CUSTOM</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;extracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+<span class="k">def</span> <span class="nf">EXTRA_SHANK_DESCRIPTION</span><span class="p">(</span><span class="n">shank</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;extracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">shank</span> <span class="o">+</span> <span class="s">&quot;/description&quot;</span>
+<span class="k">def</span> <span class="nf">EXTRA_SHANK_LOCATION</span><span class="p">(</span><span class="n">shank</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;extracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">shank</span> <span class="o">+</span> <span class="s">&quot;/location&quot;</span>
+<span class="k">def</span> <span class="nf">EXTRA_SHANK_DEVICE</span><span class="p">(</span><span class="n">shank</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;extracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">shank</span> <span class="o">+</span> <span class="s">&quot;/device&quot;</span>
+<span class="k">def</span> <span class="nf">EXTRA_SHANK_CUSTOM</span><span class="p">(</span><span class="n">shank</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;extracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">shank</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># for intra-cellular ephys recordings</span>
+
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_DESCRIPTION</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/description&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_FILTERING</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/filtering&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_DEVICE</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/device&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_LOCATION</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/location&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_RESISTANCE</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/resistance&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_SLICE</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/slice&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_SEAL</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/seal&quot;</span>
+<span class="k">def</span> <span class="nf">INTRA_ELECTRODE_INIT_ACCESS_RESISTANCE</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;intracellular_ephys/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;/initial_access_resistance&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># for optophysiology imaging</span>
+
+<span class="k">def</span> <span class="nf">IMAGE_SITE_DESCRIPTION</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/description&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_MANIFOLD</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/manifold&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_INDICATOR</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/indicator&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_EXCITATION_LAMBDA</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/excitation_lambda&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_CHANNEL_LAMBDA</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&quot;/emission_lambda&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_CHANNEL_DESCRIPTION</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&quot;/description&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_IMAGING_RATE</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/imaging_rate&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_LOCATION</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/location&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_DEVICE</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/device&quot;</span>
+<span class="k">def</span> <span class="nf">IMAGE_SITE_CUSTOM</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optophysiology/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># for optogentics</span>
+
+<span class="k">def</span> <span class="nf">OPTOGEN_SITE_DESCRIPTION</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optogenetics/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/description&quot;</span>
+<span class="k">def</span> <span class="nf">OPTOGEN_SITE_DEVICE</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optogenetics/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/device&quot;</span>
+<span class="k">def</span> <span class="nf">OPTOGEN_SITE_LAMBDA</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optogenetics/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/excitation_lambda&quot;</span>
+<span class="k">def</span> <span class="nf">OPTOGEN_SITE_LOCATION</span><span class="p">(</span><span class="n">site</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optogenetics/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/location&quot;</span>
+<span class="k">def</span> <span class="nf">OPTOGEN_SITE_CUSTOM</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;optogenetics/&quot;</span> <span class="o">+</span> <span class="n">site</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api_ep.html"
+                        title="previous chapter"><strong>Epoch management</strong></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zabs.html"
+                        title="next chapter">Abstract Feature Time Series</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/nwbco.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zabs.html" title="Abstract Feature Time Series"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api_ep.html" title="Epoch management"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

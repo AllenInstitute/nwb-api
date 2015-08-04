@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Core NWB procedures &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="TimeSeries" href="api_ts.html" />
+    <link rel="prev" title="Allen Institute for Brain Science NWB API for Python" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="api_ts.html" title="TimeSeries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Allen Institute for Brain Science NWB API for Python"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="core-nwb-procedures">
+<h1><strong>Core NWB procedures</strong><a class="headerlink" href="#core-nwb-procedures" title="Permalink to this headline">¶</a></h1>
+<p>NWB files are created and managed through an NWB object. Several
+parameters are provided to the NWB constructor describing things about
+the file, and the NWB functions and procedures are used to manipulate
+the file.</p>
+<dl class="function">
+<dt id="nwb.create_identifier">
+<tt class="descclassname">nwb.</tt><tt class="descname">create_identifier</tt><big>(</big><em>base_string</em><big>)</big><a class="headerlink" href="#nwb.create_identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an identifying string for the file, hopefully unique 
+in and between labs, based on the supplied base string, the NWB file
+version, and the time the file was created. The base string
+should contain the name of the lab, experimenter and project, or
+some other string that is unique to a given lab</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nwb.NWB">
+<em class="property">class </em><tt class="descclassname">nwb.</tt><tt class="descname">NWB</tt><big>(</big><em>**vargs</em><big>)</big><a class="headerlink" href="#nwb.NWB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents an NWB file. Calling the NWB constructor creates the file.
+The following arguments are recognized:</p>
+<blockquote>
+<div><p><strong>filename</strong> (text &#8211; mandatory) The name of the to-be-created 
+file</p>
+<p><strong>identifier</strong> (text &#8211; mandatory) A unique identifier for
+the file, to differentiate it from all other files (even in
+other labs). A suggested way to create the identifier is to
+use a lab-specific string and send it to
+nwb.create_identifier(string). This function returns the
+supplied string appended by the present date</p>
+<p><strong>description</strong> (text &#8211; mandatory) A one or two sentence
+description of the experiment and what the data in the file
+represents</p>
+<p><em>start_time</em> (text &#8211; optional) This is the starting time of the 
+experiment.  If this isn&#8217;t provided, the start time of the 
+experiment will default to the time that the file is created</p>
+<p><em>modify</em> (boolean &#8211; optional) Opens the file in append mode
+if the file exists. If the file exists and this flag (or
+&#8216;overwrite&#8217;) is not set, an error occurs (to prevent
+accidentally overwriting or modifying an existing file)</p>
+<p><em>overwrite</em> (boolean &#8211; optional) If the specified file exists,
+it will be overwritten</p>
+<p><em>keep_original</em> (boolean &#8211; optional) &#8211; If true, a back-up copy 
+of the original file will be kept, named &#8216;&lt;filename&gt;.prev&#8217;</p>
+<p><em>auto_compress</em> (boolean &#8211; optional) Data is compressed
+automatically through the API. Setting &#8216;auto_compress=False&#8217;
+disables this behavior</p>
+<p><em>custom_spec</em> (text &#8211; optional) A json, yaml or toml file
+used to customize the format specification (pyyaml or toml
+must be installed to use those formats)</p>
+</div></blockquote>
+<dl class="method">
+<dt id="nwb.NWB.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#nwb.NWB.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finishes and closes an NWB file. This includes writing pending
+data to disk and adding annotations.
+NOTE: this procedure must be called to produce a valid NWB file</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>None</dd>
+<dt>Returns:</dt>
+<dd>Nothing</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.create_epoch">
+<tt class="descname">create_epoch</tt><big>(</big><em>name</em>, <em>start</em>, <em>stop</em><big>)</big><a class="headerlink" href="#nwb.NWB.create_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new Epoch object. Epochs are used to track intervals
+in an experiment, such as exposure to a certain type of stimuli
+(an interval where orientation gratings are shown, or of 
+sparse noise) or a different paradigm (a rat exploring an 
+enclosure versus sleeping between explorations)</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>name</em> (text) The name of the epoch, as it will appear in
+the file</p>
+<p><em>start</em> (float) The starting time of the epoch</p>
+<p class="last"><em>stop</em> (float) The ending time of the epoch</p>
+</dd>
+<dt>Returns:</dt>
+<dd>Epoch object</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.create_module">
+<tt class="descname">create_module</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#nwb.NWB.create_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Module object of the specified name. Interfaces can
+be created by the module and will be stored inside it</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>name</em> (text) Name of the module as it will appear in the
+file (under /processing/)</dd>
+<dt>Returns:</dt>
+<dd>Module object</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.create_reference_image">
+<tt class="descname">create_reference_image</tt><big>(</big><em>stream</em>, <em>name</em>, <em>fmt</em>, <em>desc</em>, <em>dtype=None</em><big>)</big><a class="headerlink" href="#nwb.NWB.create_reference_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds documentation image (or movie) to file. This is stored
+in /acquisition/images/.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first"><em>stream</em> (binary) Data stream of image (eg, binary contents of .png image)</p>
+<p><em>name</em> (text) Name that image will be stored as</p>
+<p><em>fmt</em> (text) Format of the image (eg, &#8220;png&#8221;, &#8220;avi&#8221;)</p>
+<p><em>desc</em> (text) Descriptive text describing the image</p>
+<p class="last"><em>dtype</em> (text) Optional field specifying the h5py datatype to use to store <em>stream</em></p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.create_timeseries">
+<tt class="descname">create_timeseries</tt><big>(</big><em>ts_type</em>, <em>name</em>, <em>modality='other'</em><big>)</big><a class="headerlink" href="#nwb.NWB.create_timeseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new TimeSeries object. Timeseries are used to
+store and associate data or events with the time the
+data/events occur.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>ts_type</em> (text) The type of timeseries to be created.
+Default options are:</p>
+<blockquote>
+<div><p>TimeSeries &#8211; simple time series</p>
+<p>AbstractFeatureSeries &#8211; features of a presented
+stimulus. This is particularly useful when storing
+the raw stimulus is impractical and only certain
+features of the stimulus are salient. An example is
+the visual stimulus of orientation gratings, where
+the phase, spatial/temporal frequency and contrast
+are relevant, but the individual video frames are
+impractical to store, and not as useful</p>
+<p>AnnotationSeries &#8211; stores strings that annotate
+events or actions, plus the time the annotation was made</p>
+<p>ElectricalSeries &#8211; Voltage acquired during extracellular
+recordings</p>
+<p>ImageSeries &#8211; storage object for 2D image data. An
+ImageSeries can represent image data within the file
+or can point to an image stack in an external file
+(eg, png or tiff)</p>
+<p>IndexSeries &#8211; series that is composed of samples
+in an existing time series, for example images that
+are pulled from an image stack in random order</p>
+<p>ImageMaskSeries &#8211; a mask that is applied to a visual
+stimulus</p>
+<p>IntervalSeries &#8211; a list of starting and stop times
+of events</p>
+<p>OpticalSeries &#8211; a series of image frames, such as for
+video stimulus or optical recording</p>
+<p>OptogeneticSeries &#8211; optical stimulus applied during
+an optogentic experiment</p>
+<p>RoiResponseSeries &#8211; responses of a region-of-interest
+during optical recordings, such as florescence or dF/F</p>
+<p>SpatialSeries &#8211; storage of points in space over time</p>
+<p>SpikeEventSeries &#8211; snapshots of spikes events in
+an extracellular recording</p>
+<p>TwoPhotonSeries &#8211; Image stack recorded from a 
+2-photon microscope</p>
+<p>VoltageClampSeries, CurrentClampSeries &#8211; current or
+voltage recurded during a patch clamp experiment</p>
+<p>VoltageClampStimulusSeries, CurrentClampStimulusSeries
+&#8211; voltage or current used as stimulus during a
+patch clamp experiment</p>
+<p>WidefieldSeries &#8211; Image stack recorded from wide-field
+imaging</p>
+</div></blockquote>
+<p><em>name</em> (text) the name of the TimeSeries, as it will
+appear in the file</p>
+<p><em>modality</em> (text) this indicates where in the file the
+TimeSeries will be stored. Values are:</p>
+<blockquote class="last">
+<div><p>&#8216;acquisition&#8217; &#8211; acquired data stored under 
+/acquisition/timeseries</p>
+<p>&#8216;stimulus&#8217; &#8211; stimulus data stored under
+/stimulus/presentations</p>
+<p>&#8216;template&#8217; &#8211; a template for a stimulus, useful if
+a stimulus will be repeated as it only has to be
+stored once</p>
+<p>&#8216;other&#8217; (DEFAULT) &#8211; TimeSeries is to be used in a 
+module, in which case the module will manage its
+placement, or it&#8217;s up to the user where to place it</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>TimeSeries object</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.set_metadata">
+<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>value</em>, <em>**attrs</em><big>)</big><a class="headerlink" href="#nwb.NWB.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a field under /general/ and stores the specified
+information there. 
+NOTE: using the constants defined in nwbco.py is strongly
+encouraged, as this will help prevent accidental typos
+and will not require the user to remember where a particular
+piece of data is to be stored</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>key</em> (text) Name of the metadata field. Please use the
+constants and functions defined in nwbco.py</p>
+<p><em>value</em> Value of the data to be stored. This will be text
+in most cases</p>
+<p class="last"><em>attrs</em> (dictionary, or key/value pairs) Attributes that
+will be created on the metadata field</p>
+</dd>
+<dt>Returns:</dt>
+<dd>nothing</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwb.NWB.set_metadata_from_file">
+<tt class="descname">set_metadata_from_file</tt><big>(</big><em>key</em>, <em>filename</em>, <em>**attrs</em><big>)</big><a class="headerlink" href="#nwb.NWB.set_metadata_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a field under /general/ and stores the contents of
+the specified file in that field
+NOTE: using the constants defined in nwbco.py is strongly
+encouraged, as this will help prevent accidental typos
+and will not require the user to remember where a particular
+piece of data is to be stored</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>key</em> (text) Name of the metadata field. Please use the
+constants and functions defined in nwbco.py</p>
+<p><em>filename</em> (text) Name of file containing the data to 
+be stored</p>
+<p class="last"><em>attrs</em> (dictionary, or key/value pairs) Attributes that
+will be created on the metadata field</p>
+</dd>
+<dt>Returns:</dt>
+<dd>nothing</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Allen Institute for Brain Science NWB API for Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api_ts.html"
+                        title="next chapter"><strong>TimeSeries</strong></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api_nwb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="api_ts.html" title="TimeSeries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Allen Institute for Brain Science NWB API for Python"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

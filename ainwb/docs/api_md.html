@@ -1,0 +1,818 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Module and interfaces &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="Epoch management" href="api_ep.html" />
+    <link rel="prev" title="TimeSeries" href="api_ts.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="api_ep.html" title="Epoch management"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api_ts.html" title="TimeSeries"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-and-interfaces">
+<h1><strong>Module and interfaces</strong><a class="headerlink" href="#module-and-interfaces" title="Permalink to this headline">¶</a></h1>
+<p>Modules are separate groups stored in the root &#8216;processing/&#8217; group.
+Modules are designed to store the results of intermediate data
+processing that is required before scientific analysis can be performed
+on experimental data (e.g., spike sorting or image segmentation).
+Each module publishes one or more &#8216;interfaces&#8217;, which are units that
+present a specific aspect of the data. For example, the <em>Clustering</em>
+interface provides the time of an event with its cluster number.
+See the standard documentation for a description of each interface and
+a list of what data each interface publishes.</p>
+<p>Many interfaces share the same API, while some more complex interfaces
+require additional functions and procedures. Each interface is
+described below, followed by the API.</p>
+<p><strong>BehavioralEvents</strong></p>
+<p><strong>BehavioralEpochs</strong></p>
+<p><strong>BehavioralTimeSeries</strong></p>
+<p>The objective of these interfaces is to provide generic hooks for software tools/scripts. This allows a tool/script to take the output one specific interface (e.g., UnitTimes) and plot that data relative to another modality data (e.g., behavioral events) without having to define all possible modalities in advance. Declaring one of these interfaces means that one or more TimeSeries of the specified type is published. These TimeSeries should reside in a folder having the same name as the interface. For example, if a BehavioralTimeSeries interface is declared, the module will have one or more TimeSeries defined in the module sub-folder “BehavioralTimeSeries”. BehavioralEpochs should use IntervalSeries. BehavioralEvents is used for irregular events. BehavioralTimeSeries is for continuous data.</p>
+<p><strong>Clustering</strong></p>
+<p>Clustered spike data, whether from automatic clustering tools (e.g., klustakwik) or as a result of manual sorting. A Clustering module publishes the following datasets:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="25%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>times, number,
+peak_over_rms</td>
+<td>set_clusters()
+...)</td>
+<td>Convenience function to set fields &#8216;num&#8217;, &#8216;times&#8217; and
+peak_over_rms (see API description below)</td>
+</tr>
+<tr class="row-odd"><td>description <em>(text)</em></td>
+<td>set_value(&#8220;description&#8221;,
+...)</td>
+<td>Description of clusters or clustering (e.g., cluster 0
+is electrical noise, clusters curated using Klusters,
+etc)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ClusterWaveforms</strong></p>
+<p>The mean waveform shape, including standard deviation, of the different clusters. Ideally, the waveform analysis should be performed on data that is only high-pass filtered. This is a separate module because it is expected to require updating. For example, IMEC probes may require different storage requirements to store/display mean waveforms, requiring a new interface or an extension of this one. A ClusterWaveform module publishes the following datasets:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="29%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>waveform_mean
+<em>(float array)</em></td>
+<td>set_value(&#8220;waveform_mean&#8221;,
+...)</td>
+<td>The mean waveform for each cluster, using the same
+indices for each wave as cluster numbers in the
+associated Clustering module (i.e, cluster 3 is in
+array slot [3]). Waveforms corresponding to gaps in
+cluster sequence should be empty (e.g., zero-filled)</td>
+</tr>
+<tr class="row-odd"><td>waveform_sd
+<em>(float array)</em></td>
+<td>set_value(&#8220;waveform_sd&#8221;, ...)</td>
+<td>Times of events that features correspond to (can be
+a link). Array structure: [# events]</td>
+</tr>
+<tr class="row-even"><td>waveform_filtering
+<em>(text)</em></td>
+<td>set_value(&#8220;waveform_filtering&#8221;
+, ...)</td>
+<td>Filtering applied to data before generating mean/sd</td>
+</tr>
+<tr class="row-odd"><td>clustering_interface
+<em>(Clustering object
+or text path)</em></td>
+<td>set_value_as_link(
+&#8220;clustering_interface&#8221;, ...)</td>
+<td>HDF5 link to Clustering interface that was the
+source of the clustered data</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CompassDirection</strong></p>
+<p>With a CompassDirection interface, a module publish one or more SpatialSeries objects that store a floating point value for theta. The SpatialSeries::reference_frame field should indicate what direction corresponds to “0” and which is the direction of rotation (this should be “clockwise”). The si_unit for the SpatialSeries should be “radians”  or “degrees”.</p>
+<p><strong>DfOverF</strong></p>
+<p>dF/F information about a region of interest (ROI). Each DfOverF interface publishes one or more RoiResponseSeries. Storage hierarchy of dF/F should be the same as for segmentation (ie, same names for ROIs and for image planes).</p>
+<p><strong>EventDetection</strong></p>
+<p>Detected spike events from voltage trace(s).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="29%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>times
+<em>(double array)</em></td>
+<td>set_value(&#8220;times&#8221;, ...) <strong>or</strong>
+set_value_as_link(&#8220;times&#8221;,...)</td>
+<td>Times of events that features correspond to (can be
+a link). Array structure: [# events]</td>
+</tr>
+<tr class="row-odd"><td>detection_method
+<em>(text)</em></td>
+<td>set_value(&#8220;detection_method&#8221;,
+...)</td>
+<td>Description of how events were detected, such as
+voltage or dV/dT threshold, plus relevant values</td>
+</tr>
+<tr class="row-even"><td>source_electricalseries
+<em>(TimeSeries object or
+text path)</em></td>
+<td>set_value_as_link(&#8221;
+source_electricalseries&#8221;, ...)</td>
+<td>HDF5 link to TimeSeries that this data was
+calculated from. Metadata about electrodes and
+their position can be read from that TimeSeries so
+necessary to store that information here</td>
+</tr>
+</tbody>
+</table>
+<p><strong>EventWaveform</strong></p>
+<p>Represents either the waveforms of detected events, as extracted from a raw data trace in /acquisition, or the event waveforms that were stored during experiment acquisition. Each EventWaveform interface publishes one or more SpikeEventSeries.</p>
+<p><strong>EyeTracking</strong></p>
+<p>Eye-tracking data. Each interface publishes one or more SpatialSeries that store direction of gaze.</p>
+<p><strong>FeatureExtraction</strong>
+Features, such as PC1 and PC2, that are extracted from signals stored in a SpikeEvent TimeSeries or other source.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="29%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>features
+<em>(float array)</em></td>
+<td>set_value(&#8220;features&#8221;, ...)</td>
+<td>Array of features extracted for each event
+Array structure: [# events][# channels] [# features]</td>
+</tr>
+<tr class="row-odd"><td>times
+<em>(double array)</em></td>
+<td>set_value(&#8220;times&#8221;, ...) <strong>or</strong>
+set_value_as_link(&#8220;times&#8221;,...)</td>
+<td>Times of events that features correspond to (can be
+a link). Array structure: [# events]</td>
+</tr>
+<tr class="row-even"><td>description
+<em>(text array)</em></td>
+<td>set_value(&#8220;description&#8221;, ...)</td>
+<td>Description of features (eg, “PC1”) for each of the
+extracted features. Array structure: [# features]</td>
+</tr>
+<tr class="row-odd"><td>electrode_idx
+<em>(int array)</em></td>
+<td>set_value(&#8220;electrode_idx&#8221;,
+...)</td>
+<td>Indices to electrodes described in the experiment&#8217;s
+electrode map array in general/extracellular_ephys.
+Array structure: [# channels]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FilteredEphys</strong></p>
+<p>Ephys data from one or more channels that has been subjected to filtering. Examples of filtered data include Theta and Gamma (LFP has its own interface). FilteredEphys modules publish an ElectricalSeries for each filtered channel or set of channels. The name of each ElectricalSeries is arbitrary but should be informative. The source of the filtered data, whether this is from analysis of another time series or as acquired by hardware, should be noted in each&#8217;s TimeSeries::description field. There is no assumed 1::1 correspondence between filtered ephys signals and electrodes, as a single signal can apply to many nearby electrodes, and one electrode may have different filtered (e.g., theta and/or gamma) signals represented. Each interface hase one or more ElectricalSeries.</p>
+<p><strong>Fluorescence</strong></p>
+<p>Fluorescence information about a region of interest (ROI). Each Fluorescence interface has one or more RoiResponseSeries. Storage hierarchy of fluorescence should be the same as for segmentation (ie, same names for ROIs and for image planes).</p>
+<p><strong>ImageSegmentation</strong></p>
+<p>Stores pixels in an image that represent different regions of interest (ROIs). Pixels are stored in both lists and 2D maps representing image intensity. All segmentation data is stored in a “segmentation” subfolder. Each ROI is stored in its own subfolder within ImageSegmentation, with the ROI folder containing both a 2D mask and a list of pixels that make up this mask. Also for masking neuropil. If segmentation is allowed to change with time, a new interface is required (e.g., use the former version of this one, with img_mask_0 and start_time_0).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="28%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>img_mask, pix_mask,
+roi_description</td>
+<td>add_roi_mask_img() <strong>or</strong>
+add_roi_mask_pixels()</td>
+<td>Creates the definition of a region of interest</td>
+</tr>
+<tr class="row-odd"><td>reference_image</td>
+<td>add_reference_image() <strong>or</strong>
+add_reference_image_as_link()</td>
+<td>Adds a reference image that ROIs are based on</td>
+</tr>
+<tr class="row-even"><td>imaging_plane</td>
+<td>create_imaging_plane()</td>
+<td>Creates space to store data from one imaging plane</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LFP</strong></p>
+<p>LFP data from one or more channels. Each LFP interface has one or more ElectricalSeries. The electrode map in each published ElectricalSeries will identify which channels are providing LFP data. Filter properties should be noted in the ElectricalSeries description or comments field.</p>
+<p><strong>MotionCorrection</strong></p>
+<p>Publishes an image stack where all frames are shifted (registered) to a common coordinate system, to account for movement and drift between frames.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="28%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>original, corrected
+images; xy_translation</td>
+<td>add_corrected_image()</td>
+<td>Adds a motion-corrected image to the interface</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Position</strong></p>
+<p>Position data, whether along the x, x/y or x/y/z axis. Each interface stores one or more SpatialSeries storing position.</p>
+<p><strong>PupilTracking</strong></p>
+<p>Eye-tracking data. Each PupilTracking interface has one or more TimeSeries storing pupil size.</p>
+<p><strong>UnitTimes</strong></p>
+<p>Event times in observed units (eg, cell, synapse, etc). The UnitTimes folder contains a folder for each unit. Name of the folder should match value in source module, if that is possible/relevant (e.g., name of ROIs from Segmentation module).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="28%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">API call to set</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>times, description
+and source</td>
+<td>add_unit()</td>
+<td>Defines a unit, including event times and description</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="module">
+<h2><strong>Module</strong><a class="headerlink" href="#module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.Module">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">Module</tt><big>(</big><em>name</em>, <em>nwb</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.Module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing module. This is a container for one or more interfaces
+that provide data at intermediate levels of analysis</p>
+<p>Modules should be created through calls to NWB.create_module().
+They should not be instantiated directly</p>
+<dl class="method">
+<dt id="nwbmo.Module.create_interface">
+<tt class="descname">create_interface</tt><big>(</big><em>iface_type</em><big>)</big><a class="headerlink" href="#nwbmo.Module.create_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an interface within the module. 
+Each module can have multiple interfaces.
+Standard interface options are:</p>
+<blockquote>
+<div><p>BehavioralEpochs &#8211; general container for storing and
+publishing intervals (IntervalSeries)</p>
+<p>BehavioralEvents &#8211; general container for storing and
+publishing event series (TimeSeries)</p>
+<p>BehavioralTimeSeries &#8211; general container for storing and
+publishing time series (TimeSeries)</p>
+<p>Clustering &#8211; clustered spike data, whether from
+automatic clustering tools or as a result of manual
+sorting</p>
+<p>ClusterWaveform &#8211; mean event waveform of clustered data</p>
+<p>CompassDirection &#8211; publishes 1+ SpatialSeries storing
+direction in degrees (or radians)</p>
+<p>DfOverF &#8211; publishes 1+ RoiResponseSeries showing
+dF/F in observed ROIs</p>
+<p>EventDetection &#8211; information about detected events</p>
+<p>EventWaveform &#8211; publishes 1+ SpikeEventSeries
+of extracellularly recorded spike events</p>
+<p>EyeTracking &#8211; publishes 1+ SpatialSeries storing 
+direction of gaze</p>
+<p>FeatureExtraction &#8211; salient features of events</p>
+<p>FilteredEphys &#8211; publishes 1+ ElectricalSeries storing
+data from digital filtering</p>
+<p>Fluorescence &#8211; publishes 1+ RoiResponseSeries showing
+fluorescence of observed ROIs</p>
+<p>ImageSegmentation &#8211; publishes groups of pixels that
+represent regions of interest in an image</p>
+<p>LFP &#8211; a special case of FilteredEphys, filtered and
+downsampled for LFP signal</p>
+<p>MotionCorrection &#8211; publishes image stacks whos frames
+have been corrected to account for motion</p>
+<p>Position &#8211; publishes 1+ SpatialSeries storing physical
+position. This can be along x, xy or xyz axes</p>
+<p>PupilTracking &#8211; publishes 1+ standard <em>TimeSeries</em> 
+that stores pupil size</p>
+<p>UnitTimes &#8211; published data about the time(s) spikes
+were detected in an observed unit</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Module.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#nwbmo.Module.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completes the module and writes changes to disk.</p>
+<dl class="docutils">
+<dt>Arguments: </dt>
+<dd><em>none</em></dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Module.full_path">
+<tt class="descname">full_path</tt><big>(</big><big>)</big><a class="headerlink" href="#nwbmo.Module.full_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns HDF5 path of module</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>none</em></dd>
+<dt>Returns:</dt>
+<dd>(text) the HDF5 path to the module</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Module.set_description">
+<tt class="descname">set_description</tt><big>(</big><em>desc</em><big>)</big><a class="headerlink" href="#nwbmo.Module.set_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set description field in module</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>desc</em> (text) Description of module</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Module.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>key</em>, <em>value</em>, <em>**attrs</em><big>)</big><a class="headerlink" href="#nwbmo.Module.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a custom key-value pair (ie, dataset) to the root of 
+the module.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>key</em> (string) A unique identifier within the TimeSeries</p>
+<p><em>value</em> (any) The value associated with this key</p>
+<p class="last"><em>attrs</em> (dict) Dictionary of key-value pairs to be
+stored as attributes</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="root-interface-class">
+<h2><strong>root Interface class</strong><a class="headerlink" href="#root-interface-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.Interface">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">Interface</tt><big>(</big><em>name</em>, <em>module</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.Interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interfaces represent particular processing tasks and they publish
+(ie, make available) specific types of data. Each is required
+to supply a minimum of specifically named data, but all can store 
+data beyond this minimum</p>
+<p>Interfaces should be created through Module.create_interface().
+They should not be created directly</p>
+<dl class="method">
+<dt id="nwbmo.Interface.add_timeseries">
+<tt class="descname">add_timeseries</tt><big>(</big><em>ts</em><big>)</big><a class="headerlink" href="#nwbmo.Interface.add_timeseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a <em>TimeSeries</em> to the interface, setting the storage path
+of the <em>TimeSeries</em>. When a <em>TimeSeries</em> is added to an
+interface, the interface manages storage and finalization
+of it</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>ts</em> (TimeSeries) The time series object to be added to
+the interface</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.add_timeseries_as_link">
+<tt class="descname">add_timeseries_as_link</tt><big>(</big><em>ts_name</em>, <em>path</em><big>)</big><a class="headerlink" href="#nwbmo.Interface.add_timeseries_as_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a previously-defined <em>TimeSeries</em> to the interface. It will
+be added as an HDF5 link</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>ts_name</em> (text) name of time series as it will appear in
+the interface</p>
+<p class="last"><em>path</em> (text) path to the time series</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#nwbmo.Interface.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish off the interface and write pending operations to disk</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>none</em></dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.full_path">
+<tt class="descname">full_path</tt><big>(</big><big>)</big><a class="headerlink" href="#nwbmo.Interface.full_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns HDF5 path to this interface</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>none</em></dd>
+<dt>Returns:</dt>
+<dd>(text) the HDF5 path to the interface</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.set_source">
+<tt class="descname">set_source</tt><big>(</big><em>src</em><big>)</big><a class="headerlink" href="#nwbmo.Interface.set_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify source(s) for the data provided in the module.
+This can be one or more other modules, or time series
+in acquisition or stimulus</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>src</em> (text) Path to objects providing data that the
+data here is based on</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>key</em>, <em>value</em>, <em>**attrs</em><big>)</big><a class="headerlink" href="#nwbmo.Interface.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a custom key-value pair (ie, dataset) to the interface</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>key</em> (string) A unique identifier within the TimeSeries</p>
+<p class="last"><em>value</em> (any) The value associated with this key</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.Interface.set_value_as_link">
+<tt class="descname">set_value_as_link</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#nwbmo.Interface.set_value_as_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a link to another NWB object</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>key</em> (text) Name of link as it will appear in <em>TimeSeries</em></p>
+<p class="last"><em>value</em> (text, TimeSeries or Interface) The object to
+be linked to, or the path to that object</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="clustering-interface">
+<h2><strong>Clustering interface</strong><a class="headerlink" href="#clustering-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.Clustering">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">Clustering</tt><big>(</big><em>name</em>, <em>module</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.Clustering" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="nwbmo.Clustering.set_clusters">
+<tt class="descname">set_clusters</tt><big>(</big><em>times</em>, <em>num</em>, <em>peak_over_rms</em><big>)</big><a class="headerlink" href="#nwbmo.Clustering.set_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conveninece function to set interface values. Includes
+sanity checks for array lengths</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>times</em> (double array) Times of clustered events, in
+seconds. This may be a link to times field in associated
+FeatureExtraction module. Array structure: [num events]</p>
+<p><em>num</em> (int array) Cluster number for each event Array 
+structure: [num events]</p>
+<p><em>description</em> (text)  Description of clusters or 
+clustering (e.g., cluster 0 is electrical noise, 
+clusters curated using Klusters, etc)</p>
+<p class="last"><em>peak_over_rms</em> (float array) Maximum ratio of waveform 
+peak to RMS on any channel in the cluster (provides a 
+basic clustering metric).  Array structure: [num clusters]</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="imagesegmentation-interface">
+<h2><strong>ImageSegmentation interface</strong><a class="headerlink" href="#imagesegmentation-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.ImageSegmentation">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">ImageSegmentation</tt><big>(</big><em>name</em>, <em>module</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.ImageSegmentation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="nwbmo.ImageSegmentation.add_reference_image">
+<tt class="descname">add_reference_image</tt><big>(</big><em>plane</em>, <em>name</em>, <em>img</em><big>)</big><a class="headerlink" href="#nwbmo.ImageSegmentation.add_reference_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a reference image to the segmentation interface</p>
+<dl class="docutils">
+<dt>Arguments: </dt>
+<dd><p class="first"><em>plane</em> (text) name of imaging plane</p>
+<p><em>name</em> (text) name of reference image</p>
+<p class="last"><em>img</em> (byte array) raw pixel map of image, 8-bit grayscale</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.ImageSegmentation.add_roi_mask_img">
+<tt class="descname">add_roi_mask_img</tt><big>(</big><em>image_plane</em>, <em>roi_name</em>, <em>desc</em>, <em>img</em><big>)</big><a class="headerlink" href="#nwbmo.ImageSegmentation.add_roi_mask_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an ROI to the module, with the ROI defined within a 2D image.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>image_plane</em> (text) name of imaging plane</p>
+<p><em>roi_name</em> (text) name of ROI</p>
+<p><em>desc</em> (text) description of ROI</p>
+<p class="last"><em>img</em> (2D float array) description of ROI in a pixel map (float[y][x])</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.ImageSegmentation.add_roi_mask_pixels">
+<tt class="descname">add_roi_mask_pixels</tt><big>(</big><em>image_plane</em>, <em>roi_name</em>, <em>desc</em>, <em>pixel_list</em>, <em>weights</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#nwbmo.ImageSegmentation.add_roi_mask_pixels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an ROI to the module, with the ROI defined using a list of pixels.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>image_plane</em> (text) name of imaging plane</p>
+<p><em>roi_name</em> (text) name of ROI</p>
+<p><em>desc</em> (text) description of ROI</p>
+<p><em>pixel_list</em> (2D int array) array of [x,y] pixel values</p>
+<p><em>weights</em> (float array) array of pixel weights</p>
+<p><em>width</em> (int) width of reference image, in pixels</p>
+<p class="last"><em>height</em> (int) height of reference image, in pixels</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.ImageSegmentation.create_imaging_plane">
+<tt class="descname">create_imaging_plane</tt><big>(</big><em>plane</em>, <em>description</em><big>)</big><a class="headerlink" href="#nwbmo.ImageSegmentation.create_imaging_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines imaging manifold. This can be a simple 1D or
+2D manifold, a complex 3D manifold, or even random
+access. The manifold defines the spatial coordinates for
+each pixel. If multi-planar manifolds are to be defined
+separately, a separate imaging plane should be used for each.
+Non-planar manifolds should be stored as a vector.</p>
+<p>Pixels in the manifold must have a 1:1 correspondence
+with image segmentation masks and the masks and manifold
+must have the same dimensions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="motioncorrection-interface">
+<h2><strong>MotionCorrection interface</strong><a class="headerlink" href="#motioncorrection-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.MotionCorrection">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">MotionCorrection</tt><big>(</big><em>name</em>, <em>module</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.MotionCorrection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="nwbmo.MotionCorrection.add_corrected_image">
+<tt class="descname">add_corrected_image</tt><big>(</big><em>name</em>, <em>orig</em>, <em>xy_translation</em>, <em>corrected</em><big>)</big><a class="headerlink" href="#nwbmo.MotionCorrection.add_corrected_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a motion-corrected image to the module, including
+the original image stack, the x,y delta necessary to
+shift the image frames for registration, and the corrected
+image stack.
+NOTE 1: All 3 timeseries use the same timestamps and so can share/
+link timestamp arrays</p>
+<p>NOTE 2: The timeseries passed in as &#8216;xy_translation&#8217; and
+&#8216;corrected&#8217; will be renamed to these names, if they are not
+links to existing timeseries</p>
+<p>NOTE 3: The timeseries arguments can be either TimeSeries
+objects (new or old in case of latter 2 args) or strings.
+If they are new TimeSeries objects, they will be stored
+within the module. If they are existing objects, a link
+to those objects will be created</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>orig</em> (ImageSeries or text) ImageSeries object or
+text path to original image time series</p>
+<p><em>xy_translation</em> TimeSeries storing displacements of
+x and y direction in the data[] field</p>
+<p class="last"><em>corrected</em> Motion-corrected ImageSeries</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="unittimes-interface">
+<h2><strong>UnitTimes interface</strong><a class="headerlink" href="#unittimes-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nwbmo.UnitTimes">
+<em class="property">class </em><tt class="descclassname">nwbmo.</tt><tt class="descname">UnitTimes</tt><big>(</big><em>name</em>, <em>module</em>, <em>spec</em><big>)</big><a class="headerlink" href="#nwbmo.UnitTimes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="nwbmo.UnitTimes.add_unit">
+<tt class="descname">add_unit</tt><big>(</big><em>unit_name</em>, <em>unit_times</em>, <em>description</em>, <em>source</em><big>)</big><a class="headerlink" href="#nwbmo.UnitTimes.add_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds data about a unit to the module, including unit name,
+description and times.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>unit_name</em> (text) Name of the unit, as it will appear in the file</p>
+<p><em>unit_times</em> (double array) Times that the unit spiked</p>
+<p><em>description</em> (text) Information about the unit</p>
+<p class="last"><em>source</em> (text) Name, path or description of where unit times originated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.UnitTimes.append_unit_data">
+<tt class="descname">append_unit_data</tt><big>(</big><em>unit_name</em>, <em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#nwbmo.UnitTimes.append_unit_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add auxiliary information (key-value) about a unit.
+Data will be stored in the folder that contains data
+about that unit.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first"><em>unit_name</em> (text) Name of unit, as it appears in the file</p>
+<p><em>key</em> (text) Key under which the data is added</p>
+<p class="last"><em>value</em> (any) Data to be added</p>
+</dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nwbmo.UnitTimes.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#nwbmo.UnitTimes.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extended (subclassed) finalize procedure. It creates and stores a list of all units in the module and then
+calls the superclass finalizer.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><em>none</em></dd>
+<dt>Returns:</dt>
+<dd><em>nothing</em></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><strong>Module and interfaces</strong></a><ul>
+<li><a class="reference internal" href="#module"><strong>Module</strong></a></li>
+<li><a class="reference internal" href="#root-interface-class"><strong>root Interface class</strong></a></li>
+<li><a class="reference internal" href="#clustering-interface"><strong>Clustering interface</strong></a></li>
+<li><a class="reference internal" href="#imagesegmentation-interface"><strong>ImageSegmentation interface</strong></a></li>
+<li><a class="reference internal" href="#motioncorrection-interface"><strong>MotionCorrection interface</strong></a></li>
+<li><a class="reference internal" href="#unittimes-interface"><strong>UnitTimes interface</strong></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api_ts.html"
+                        title="previous chapter"><strong>TimeSeries</strong></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api_ep.html"
+                        title="next chapter"><strong>Epoch management</strong></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api_md.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="api_ep.html" title="Epoch management"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api_ts.html" title="TimeSeries"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

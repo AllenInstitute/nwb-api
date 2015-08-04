@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MotionCorrection Interface &mdash; Allen Institute for Brain Science NWB API for Python 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen Institute for Brain Science NWB API for Python 1.0 documentation" href="index.html" />
+    <link rel="next" title="Extracellular ephys example" href="zel1.html" />
+    <link rel="prev" title="Behavioral Epoch Module" href="zbeh.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zel1.html" title="Extracellular ephys example"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zbeh.html" title="Behavioral Epoch Module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="motioncorrection-interface">
+<h1>MotionCorrection Interface<a class="headerlink" href="#motioncorrection-interface" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nwb</span>
+<span class="c"># nwbco stores constants that are useful for setting experiment-level</span>
+<span class="c">#   metadata</span>
+<span class="kn">from</span> <span class="nn">nwb.nwbco</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">An example of using the MotionCorrection interface</span>
+
+<span class="sd">Modules and interfaces address intermediate processing of experimental</span>
+<span class="sd">data. Intermediate processing is processing that&#39;s necessary to</span>
+<span class="sd">convert the acquired data into a form that scientific analysis can</span>
+<span class="sd">be performed on. In this example, that process is motion-correcting</span>
+<span class="sd">an image. </span>
+
+<span class="sd">Processing and storing data in modules will typically be done</span>
+<span class="sd">by people writing software that perform the processing tasks. The</span>
+<span class="sd">software writer is free to store whatever additional data they wish</span>
+<span class="sd">to store in a module. All that&#39;s required is the minimum data</span>
+<span class="sd">required by each interface is included.</span>
+
+<span class="sd">The MotionCorrection interface stores an unregistered image,</span>
+<span class="sd">the xy translation necessary to motion-correct it, and the</span>
+<span class="sd">corrected image. In this example, a time series storing 2-photon</span>
+<span class="sd">image data is created, as if it were the original image coming</span>
+<span class="sd">from a 2-photon microscope. Another time series is created that stores</span>
+<span class="sd">the XY delta for each imaging frame necessary to correct for motion.</span>
+<span class="sd">A third time series is created pointing to the corrected image.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># create a new NWB file</span>
+<span class="c"># several settings are specified when doing so. these can be supplied within</span>
+<span class="c">#   the NWB constructor or defined in a dict, as in in this example</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;sample_motion_correction.nwb&quot;</span>
+
+<span class="c"># each file should have a descriptive globally unique identifier </span>
+<span class="c">#   that specifies the lab and this experiment session</span>
+<span class="c"># the function nwb.create_identifier() is recommended to use as it takes</span>
+<span class="c">#   the string and appends the present date and time</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">create_identifier</span><span class="p">(</span><span class="s">&quot;motion correction example&quot;</span><span class="p">)</span>
+
+<span class="c"># indicate that it&#39;s OK to overwrite exting file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;overwrite&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># specify the start time of the experiment. all times in the NWB file</span>
+<span class="c">#   are relative to experiment start time</span>
+<span class="c"># if the start time is not specified the present time will be used</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;start_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Sat Jul 04 2015 3:14:16&quot;</span>
+
+<span class="c"># provide one or two sentences that describe the experiment and what</span>
+<span class="c">#   data is in the file</span>
+<span class="n">settings</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Test file demonstrating use of the MotionCorrection interface&quot;</span>
+
+<span class="c"># create the NWB object. this manages the file</span>
+<span class="k">print</span> <span class="s">&quot;Creating &quot;</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s">&quot;filename&quot;</span><span class="p">]</span>
+<span class="n">neurodata</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">NWB</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+<span class="c">########################################################################</span>
+<span class="c"># this is a sample optophysiology dataset storing simulated 2-photon</span>
+<span class="c">#   image stacks. these must refer to an imaging plane that&#39;s defined</span>
+<span class="c">#   in the general metadata section. define that metadata here</span>
+<span class="c"># the metadata fields (all caps) are defined in nwbco</span>
+<span class="c"># </span>
+<span class="c"># define the recording device</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">(</span><span class="s">&quot;Acme 2-photon microscope&quot;</span><span class="p">),</span> <span class="s">&quot;Information about device goes here&quot;</span><span class="p">)</span>
+<span class="c"># declare information about a particular site and/or imaging plane</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">IMAGE_SITE_EXCITATION_LAMBDA</span><span class="p">(</span><span class="s">&quot;camera1&quot;</span><span class="p">),</span> <span class="s">&quot;1000 nm&quot;</span><span class="p">)</span> 
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">IMAGE_SITE_INDICATOR</span><span class="p">(</span><span class="s">&quot;camera1&quot;</span><span class="p">),</span> <span class="s">&quot;GCaMP6s&quot;</span><span class="p">)</span> 
+<span class="n">neurodata</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">IMAGE_SITE_DEVICE</span><span class="p">(</span><span class="s">&quot;camera1&quot;</span><span class="p">),</span> <span class="s">&quot;Acme 2-photon microscope&quot;</span><span class="p">)</span> 
+<span class="c">########################################################################</span>
+<span class="c"># create different examples of image series</span>
+<span class="c"># image can be stored directly, for example by reading a .tif file into</span>
+<span class="c">#   memory and storing this data as a byte stream in data[]</span>
+<span class="c"># most(all?) examples here will have the time series reference data</span>
+<span class="c">#   that is stored externally in the file system</span>
+
+<span class="c"># first, a simple image. this could be a simple ImageSeries. in this</span>
+<span class="c">#   example we&#39;re using a TwoPhotonSeries, which is an ImageSeries</span>
+<span class="c">#   with some extra data fields</span>
+<span class="n">orig</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;TwoPhotonSeries&quot;</span><span class="p">,</span> <span class="s">&quot;source image&quot;</span><span class="p">,</span> <span class="s">&quot;acquisition&quot;</span><span class="p">)</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;Pointer to a 640x480 image stored in the file system&quot;</span><span class="p">)</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="s">&quot;Data acquired from Acme 2-photon microscope&quot;</span><span class="p">)</span>
+<span class="c"># assume the file is stored externally in the file system</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;format&quot;</span><span class="p">,</span> <span class="s">&quot;external&quot;</span><span class="p">)</span>
+<span class="c"># specify the file</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;external_file&quot;</span><span class="p">,</span> <span class="s">&quot;/path/to/file/stack.tif&quot;</span><span class="p">)</span>
+<span class="c"># information about the image</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;bits_per_pixel&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;dimension&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">])</span>
+<span class="c">###########################</span>
+<span class="c"># TwoPhoton-specific fields</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;pmt_gain&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="c"># field of view is in meters</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;field_of_view&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0003</span><span class="p">,</span> <span class="mf">0.0003</span><span class="p">])</span>
+<span class="c"># imaging plane value is the site/imaging-plane defined as metadata above</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;imaging_plane&quot;</span><span class="p">,</span> <span class="s">&quot;cameria1&quot;</span><span class="p">)</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;scan_line_rate&quot;</span><span class="p">,</span> <span class="mi">16000</span><span class="p">)</span>
+<span class="c">###########################</span>
+<span class="c"># store time -- this example has 3 frames</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_time</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c"># there&#39;s no data to store in the NWB file as the data is in an image</span>
+<span class="c">#   file in the file system</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">ignore_data</span><span class="p">()</span>
+<span class="c"># when we ignore data, we must explicitly set number of samples (this is</span>
+<span class="c">#   otherwise handled automatically)</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;num_samples&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c"># this is simulated acquired data</span>
+<span class="c"># finish the time series so data is written to disk</span>
+<span class="n">orig</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c"># this example is for storing motion corrected 2-photon images</span>
+<span class="c"># store the pixel delta for each frame in the source stack</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;TimeSeries&quot;</span><span class="p">,</span> <span class="s">&quot;x,y adjustments&quot;</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;X,Y adjustments to original image necessary for registration&quot;</span><span class="p">)</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">set_data</span><span class="p">([[</span><span class="mf">1.23</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.45</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">2.18</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">4.2</span><span class="p">,</span> <span class="mf">1.35</span><span class="p">]])</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">set_time_as_link</span><span class="p">(</span><span class="n">orig</span><span class="p">)</span>
+<span class="c"># setting time as link also requires setting number of samples manually </span>
+<span class="c">#   FIXME</span>
+<span class="c"># if you try to create a time series and a required field is absent, the</span>
+<span class="c">#   API will give an error about the missing field (try commenting out </span>
+<span class="c">#   the line set_data(), set_time() or set_value(&quot;num_samples&quot;) to see this</span>
+<span class="c">#   behavior in action</span>
+<span class="n">xy</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;num_samples&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c"># &#39;xy&#39; is motion corrected data and is part of the processing module</span>
+<span class="c"># module time series are finalized by the module interface that they&#39;re</span>
+<span class="c">#   added to, so don&#39;t do it here</span>
+
+<span class="c"># the module interface also stores the corrected image. assume that</span>
+<span class="c">#   it&#39;s in the file system too</span>
+<span class="n">corr</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_timeseries</span><span class="p">(</span><span class="s">&quot;ImageSeries&quot;</span><span class="p">,</span> <span class="s">&quot;corrected_image&quot;</span><span class="p">,</span> <span class="s">&quot;acquisition&quot;</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">&quot;Corrected image&quot;</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_comments</span><span class="p">(</span><span class="s">&quot;Motion correction calculated manually in photoshop&quot;</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;format&quot;</span><span class="p">,</span> <span class="s">&quot;external&quot;</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;external_file&quot;</span><span class="p">,</span> <span class="s">&quot;/path/to/file/corrected_stack.tif&quot;</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;bits_per_pixel&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;dimension&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">])</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_time_as_link</span><span class="p">(</span><span class="n">orig</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;num_samples&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">ignore_data</span><span class="p">()</span>
+<span class="n">corr</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+
+<span class="c"># create the module and MotionCorrection interface</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">neurodata</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s">&quot;my module&quot;</span><span class="p">)</span>
+<span class="c"># the module can store as many interfaces as we like. in this case we </span>
+<span class="c">#   only have one. create it</span>
+<span class="n">iface</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">create_interface</span><span class="p">(</span><span class="s">&quot;MotionCorrection&quot;</span><span class="p">)</span>
+<span class="c"># add the time series to the interface</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">add_corrected_image</span><span class="p">(</span><span class="s">&quot;2photon&quot;</span><span class="p">,</span> <span class="n">orig</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+<span class="c"># the time series can be added by providing the python object or </span>
+<span class="c">#   by specifying the paths to these objects, whichever is more</span>
+<span class="c">#   convenient. the following calls are equivalent:</span>
+<span class="c">#iface.add_corrected_image(&quot;2photon&quot;, orig.full_path(), xy.full_path(), corr)</span>
+<span class="c">#iface.add_corrected_image(&quot;2photon&quot;, orig, xy, corr.full_path())</span>
+<span class="c">#   as would be specifying the paths to the time series manually </span>
+<span class="c">#   (eg, as stored in a variable)</span>
+
+<span class="c"># provide information in the interface about the source of the data</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="n">orig</span><span class="o">.</span><span class="n">full_path</span><span class="p">())</span>
+
+<span class="n">iface</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;random comment&quot;</span><span class="p">,</span> <span class="s">&quot;Note that the &#39;original&#39; field under 2photon is an HDF5 link to the time series &#39;/acquisition/timeseries/source image&#39;&quot;</span><span class="p">)</span>
+
+<span class="c"># finish off the interface</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c"># finish off the module</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+<span class="c"># when all data is entered, close the file</span>
+<span class="n">neurodata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zbeh.html"
+                        title="previous chapter">Behavioral Epoch Module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zel1.html"
+                        title="next chapter">Extracellular ephys example</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/zcor.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zel1.html" title="Extracellular ephys example"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zbeh.html" title="Behavioral Epoch Module"
+             >previous</a> |</li>
+        <li><a href="index.html">Allen Institute for Brain Science NWB API for Python 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Allen Institute.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
