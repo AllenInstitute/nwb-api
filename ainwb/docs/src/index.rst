@@ -7,7 +7,7 @@ Allen Institute for Brain Science NWB API for Python
 ====================================================
 
 The NWB File Format is defined in the document
-:download:`neurodata_spec.1.0.pdf <neurodata_spec.1.0.pdf>`
+:download:`nwb_file_format_specification_v1.0.pdf <nwb_file_format_specification_v1.0.pdf>`
 
 The Allen Institute's API for writing NWB files is described below.
 
