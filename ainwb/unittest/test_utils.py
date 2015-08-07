@@ -11,6 +11,8 @@ def print_error(context, err_string):
     print "**** Error in function '%s'" % func
     print "Context: " + context
     print "Error: " + err_string
+    print "Stack:"
+    traceback.print_stack()
     print "----------------------------------------"
     sys.exit(1)
 
@@ -115,7 +117,7 @@ def verify_timeseries(hfile, name, location, ts_type):
             
 
 def verify_present(hfile, group, field):
-    """ verify that a field is present
+    """ verify that a field is present and returns its contents
     """ 
     try:
         f = h5py.File(hfile, 'r')
@@ -127,10 +129,16 @@ def verify_present(hfile, group, field):
         exc_error("Opening group", e)
     if field not in g:
         error("Verifying presence of '"+field+"'", "Field absent")
+    obj = g[field]
+    if type(obj).__name__ == "Group":
+        val = None
+    else:
+        val = obj.value
     f.close()
+    return val
 
 def verify_attribute_present(hfile, obj, field):
-    """ verify that a field is present
+    """ verify that an attribute is present and returns its contents
     """ 
     try:
         f = h5py.File(hfile, 'r')
