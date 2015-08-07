@@ -3,7 +3,7 @@ import nwb
 from nwb.nwbco import *
 import test_utils as ut
 
-# TESTS top-level fields stored in general
+# TESTS fields stored in general/subject
 
 def test_field(fname, name):
     val = ut.verify_present(fname, "general/subject/", name.lower())
