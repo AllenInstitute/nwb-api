@@ -207,7 +207,7 @@ class NWB(object):
         self.keep_original = False 
         #
         self.tmp_name = self.file_name + ".tmp"
-        if os.path.isfile(self.file_name):
+        if self.file_exists:
             # file exists -- see if modify flag set
             if "modify" in vargs and vargs["modify"] == True:
                 self.open_existing()
@@ -239,6 +239,18 @@ class NWB(object):
     # internal API function to process constructor arguments
     def read_arguments(self, **vargs):
         err_str = ""
+        # file name
+        if "filename" in vargs:
+            self.file_name = vargs["filename"]
+        elif "file_name" in vargs:
+            self.file_name = vargs["file_name"]
+        else:
+            err_str += "    argument '%s' was not specified\n" % "filename"
+        # see if file exists -- some arguments aren't required if so
+        if os.path.isfile(self.file_name):
+            self.file_exists = True
+        else:
+            self.file_exists = False
         # read start time
         if "start_time" in vargs:
             self.start_time = vargs["start_time"]
@@ -262,20 +274,13 @@ class NWB(object):
         # read identifier
         if "identifier" in vargs:
             self.file_identifier = vargs["identifier"]
-        else:
+        elif not self.file_exists:
             err_str += "    argument '%s' was not specified\n" % "identifier"
         # read session description
         if "description" in vargs:
             self.session_description = vargs["description"]
-        else:
+        elif not self.file_exists:
             err_str += "    argument 'description' was not specified\n"
-        # file name
-        if "filename" in vargs:
-            self.file_name = vargs["filename"]
-        elif "file_name" in vargs:
-            self.file_name = vargs["file_name"]
-        else:
-            err_str += "    argument '%s' was not specified\n" % "filename"
         # handle errors
         if len(err_str) > 0:
             print "Error creating Borg object - missing constructor value(s)"
