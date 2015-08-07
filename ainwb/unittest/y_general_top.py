@@ -4,6 +4,8 @@ from nwb.nwbco import *
 import test_utils as ut
 
 # TESTS top-level fields stored in general
+# TESTS storing metadata from file
+# TESTS 'Custom' tagging on custom attributes
 
 def test_field(fname, name):
     val = ut.verify_present(fname, "general/", name.lower())
@@ -28,6 +30,12 @@ def test_general_top():
     test_field(fname, "STIMULUS")
     test_field(fname, "SURGERY")
     test_field(fname, "VIRUS")
+    val = ut.verify_present(fname, "general/", "source_script")
+    if len(val) < 1000:
+        ut.error("Checking metadata_from_file", "unexpected field size")
+    val = ut.verify_attribute_present(fname, "general/source_script", "neurodata_type")
+    if val != "Custom":
+        ut.error("Checking custom tag", "neurodata_type incorrect")
 
 
 def create_general_top(fname):
@@ -52,6 +60,8 @@ def create_general_top(fname):
     neurodata.set_metadata(STIMULUS, "STIMULUS")
     neurodata.set_metadata(SURGERY, "SURGERY")
     neurodata.set_metadata(VIRUS, "VIRUS")
+    #
+    neurodata.set_metadata_from_file("source_script", __file__)
     #
     neurodata.close()
 
