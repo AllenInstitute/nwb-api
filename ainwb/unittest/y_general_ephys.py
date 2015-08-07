@@ -10,10 +10,10 @@ def test_field(fname, name, subdir):
     if val != name:
         ut.error("Checking metadata", "field value incorrect")
 
-def test_general_subject():
+def test_general_extra():
     #fname = "x_nodata_series_acq.nwb"
     fname = "x" + __file__[3:-3] + ".nwb"
-    create_general_subject(fname)
+    create_general_extra(fname)
     #
     val = ut.verify_present(fname, "general/extracellular_ephys", "electrode_map")
     if len(val) != 2 and len(val[0]) != 3:
@@ -35,7 +35,7 @@ def test_general_subject():
     #
     val = ut.verify_present(fname, "general/extracellular_ephys/", "EXTRA_CUSTOM")
     if val != "EXTRA_CUSTOM":
-        ut.error("Checking filtering", "Field value incorrect")
+        ut.error("Checking custom", "Field value incorrect")
     #
 
     test_field(fname, "DESCRIPTION", "p1")
@@ -48,12 +48,12 @@ def test_general_subject():
     test_field(fname, "EXTRA_SHANK_CUSTOM", "p2")
 
 
-def create_general_subject(fname):
+def create_general_extra(fname):
     settings = {}
     settings["filename"] = fname
-    settings["identifier"] = nwb.create_identifier("general top test")
+    settings["identifier"] = nwb.create_identifier("general extracellular test")
     settings["overwrite"] = True
-    settings["description"] = "test top-level elements in /general"
+    settings["description"] = "test top-level elements in /general/extracellular_ephys"
     neurodata = nwb.NWB(**settings)
     #
     neurodata.set_metadata(EXTRA_ELECTRODE_MAP, [[1,1,1], [1,2,3]])
@@ -74,6 +74,6 @@ def create_general_subject(fname):
     #
     neurodata.close()
 
-test_general_subject()
+test_general_extra()
 print "%s PASSED" % __file__
 

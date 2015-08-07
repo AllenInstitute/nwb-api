@@ -92,22 +92,26 @@ def EXTRA_SHANK_CUSTOM(shank, name):
 ########################################################################
 # for intra-cellular ephys recordings
 
-def INTRA_ELECTRODE_DESCRIPTION(name):
-    return "intracellular_ephys/" + name + "/description"
-def INTRA_ELECTRODE_FILTERING(name):
-    return "intracellular_ephys/" + name + "/filtering"
-def INTRA_ELECTRODE_DEVICE(name):
-    return "intracellular_ephys/" + name + "/device"
-def INTRA_ELECTRODE_LOCATION(name):
-    return "intracellular_ephys/" + name + "/location"
-def INTRA_ELECTRODE_RESISTANCE(name):
-    return "intracellular_ephys/" + name + "/resistance"
-def INTRA_ELECTRODE_SLICE(name):
-    return "intracellular_ephys/" + name + "/slice"
-def INTRA_ELECTRODE_SEAL(name):
-    return "intracellular_ephys/" + name + "/seal"
-def INTRA_ELECTRODE_INIT_ACCESS_RESISTANCE(name):
-    return "intracellular_ephys/" + name + "/initial_access_resistance"
+def INTRA_CUSTOM(name):
+    return "intracellular_ephys/" + name
+def INTRA_ELECTRODE_DESCRIPTION(electrode):
+    return "intracellular_ephys/" + electrode + "/description"
+def INTRA_ELECTRODE_FILTERING(electrode):
+    return "intracellular_ephys/" + electrode + "/filtering"
+def INTRA_ELECTRODE_DEVICE(electrode):
+    return "intracellular_ephys/" + electrode + "/device"
+def INTRA_ELECTRODE_LOCATION(electrode):
+    return "intracellular_ephys/" + electrode + "/location"
+def INTRA_ELECTRODE_RESISTANCE(electrode):
+    return "intracellular_ephys/" + electrode + "/resistance"
+def INTRA_ELECTRODE_SLICE(electrode):
+    return "intracellular_ephys/" + electrode + "/slice"
+def INTRA_ELECTRODE_SEAL(electrode):
+    return "intracellular_ephys/" + electrode + "/seal"
+def INTRA_ELECTRODE_INIT_ACCESS_RESISTANCE(electrode):
+    return "intracellular_ephys/" + electrode + "/initial_access_resistance"
+def INTRA_ELECTRODE_CUSTOM(electrode, name):
+    return "intracellular_ephys/" + electrode + "/" + name
 
 ########################################################################
 # for optophysiology imaging
