@@ -316,6 +316,22 @@
         {
           "_datatype" : "str", "_include" : "optional",
           "_description" : "location of stimulation site"
+        },
+        "[]" :
+        {
+          "_datatype" : "str", 
+          "_include" : "optional",
+          "_description" : "Custom dataset",
+          "_attributes" :
+          {
+            "neurodata_type" :
+            {
+              "_datatype" : "str",
+              "_description" : "Custom field",
+              "_value" : "Custom",
+              "_include" : "required"
+            }
+          }
         }
       }
     },

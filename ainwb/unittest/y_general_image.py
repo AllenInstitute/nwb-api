@@ -49,7 +49,7 @@ def create_general_intra(fname):
     settings["filename"] = fname
     settings["identifier"] = nwb.create_identifier("general optophysiology test")
     settings["overwrite"] = True
-    settings["description"] = "test top-level elements in /general/optophysiology"
+    settings["description"] = "test elements in /general/optophysiology"
     neurodata = nwb.NWB(**settings)
     #
     neurodata.set_metadata(IMAGE_CUSTOM("image_custom"), "IMAGE_CUSTOM")

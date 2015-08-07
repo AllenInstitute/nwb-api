@@ -53,7 +53,7 @@ def create_general_extra(fname):
     settings["filename"] = fname
     settings["identifier"] = nwb.create_identifier("general extracellular test")
     settings["overwrite"] = True
-    settings["description"] = "test top-level elements in /general/extracellular_ephys"
+    settings["description"] = "test elements in /general/extracellular_ephys"
     neurodata = nwb.NWB(**settings)
     #
     neurodata.set_metadata(EXTRA_ELECTRODE_MAP, [[1,1,1], [1,2,3]])

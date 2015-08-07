@@ -46,7 +46,7 @@ def create_general_intra(fname):
     settings["filename"] = fname
     settings["identifier"] = nwb.create_identifier("general intracellular test")
     settings["overwrite"] = True
-    settings["description"] = "test top-level elements in /general/intracellular_ephys"
+    settings["description"] = "test elements in /general/intracellular_ephys"
     neurodata = nwb.NWB(**settings)
     #
     neurodata.set_metadata(INTRA_CUSTOM("intra_custom"), "INTRA_CUSTOM")

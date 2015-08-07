@@ -142,12 +142,14 @@ def IMAGE_SITE_CUSTOM(site, name):
 ########################################################################
 # for optogentics
 
+def OPTOGEN_CUSTOM(name):
+    return "optogenetics/" + name
 def OPTOGEN_SITE_DESCRIPTION(site):
     return "optogenetics/" + site + "/description"
 def OPTOGEN_SITE_DEVICE(site):
     return "optogenetics/" + site + "/device"
 def OPTOGEN_SITE_LAMBDA(site):
-    return "optogenetics/" + site + "/excitation_lambda"
+    return "optogenetics/" + site + "/lambda"
 def OPTOGEN_SITE_LOCATION(site):
     return "optogenetics/" + site + "/location"
 def OPTOGEN_SITE_CUSTOM(site, name):
