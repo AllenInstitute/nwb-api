@@ -223,22 +223,6 @@
           "_datatype" : "str", "_include" : "optional",
           "_description" : "excitation wavelength (include unit)"
         },
-		"<>" :
-		{
-		  "_datatype" : "group",
-          "_include" : "optional",
-          "_description" : "One of possibly many folders describing channel",
-          "description" :
-          {
-            "_datatype" : "str", "_include" : "standard",
-	  	  "_description" : "Array of names of channels, eg, '0001', or 'red'"
-          },
-          "emmision_lambda" :
-          {
-            "_datatype" : "f4", "_include" : "standard",
-	  	  "_description" : "Array of emission lambda, one for each channel"
-	  	  }
-        },
         "imaging_rate" :
         {
           "_datatype" : "str", "_include" : "optional"
@@ -253,6 +237,22 @@
           "_datatype" : "str", "_include" : "optional",
           "_description" : "name of recording device",
           "_linkto" : "general/devices/"
+        },
+        "[]" :
+        {
+          "_datatype" : "str", 
+          "_include" : "optional",
+          "_description" : "Custom dataset",
+          "_attributes" :
+          {
+            "neurodata_type" :
+            {
+              "_datatype" : "str",
+              "_description" : "Custom field",
+              "_value" : "Custom",
+              "_include" : "required"
+            }
+          }
         },
 		"<>" :
 		{
