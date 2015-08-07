@@ -21,7 +21,7 @@ def test_nodata_series():
 def create_startingtime_series(fname, name, target):
     settings = {}
     settings["filename"] = fname
-    settings["identifier"] = nwb.create_identifier("starting time example")
+    settings["identifier"] = nwb.create_identifier("starting time test")
     settings["overwrite"] = True
     settings["description"] = "time series starting time test"
     settings["start_time"] = "Sat Jul 04 2015 3:14:16"

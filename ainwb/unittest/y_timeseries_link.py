@@ -55,9 +55,9 @@ def test_ts_link():
 def create_linked_series(fname, root):
     settings = {}
     settings["filename"] = fname
-    settings["identifier"] = nwb.create_identifier("nodata example")
+    settings["identifier"] = nwb.create_identifier("link test")
     settings["overwrite"] = True
-    settings["description"] = "time series no data test"
+    settings["description"] = "time series link test"
     settings["start_time"] = "Sat Jul 04 2015 3:14:16"
     neurodata = nwb.NWB(**settings)
     #

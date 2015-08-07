@@ -26,10 +26,10 @@ def create_annotation_series(fname, name, target, newfile):
     settings = {}
     settings["filename"] = fname
     if newfile:
-        settings["identifier"] = nwb.create_identifier("annotation example")
+        settings["identifier"] = nwb.create_identifier("append example")
         settings["overwrite"] = True
         settings["start_time"] = "Sat Jul 04 2015 3:14:16"
-        settings["description"] = "Test file with AnnotationSeries"
+        settings["description"] = "Test append file"
     else:
         settings["modify"] = True
     neurodata = nwb.NWB(**settings)

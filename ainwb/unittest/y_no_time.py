@@ -27,7 +27,7 @@ def create_notime_series(fname, name, target):
     settings["identifier"] = nwb.create_identifier("notime example")
     settings["overwrite"] = True
     settings["start_time"] = "Sat Jul 04 2015 3:14:16"
-    settings["description"] = "Test file with AnnotationSeries"
+    settings["description"] = "Test no time"
     neurodata = nwb.NWB(**settings)
     #
     notime = neurodata.create_timeseries("TimeSeries", name, target)
