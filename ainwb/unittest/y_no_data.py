@@ -7,7 +7,9 @@ import test_utils as ut
 # TESTS TimeSeries.ignore_data()
 
 def test_nodata_series():
-    fname = "x_nodata_series_acq.nwb"
+    #fname = "x_nodata_series_acq.nwb"
+    fname = "x" + __file__[3:-3] + ".nwb"
+    print fname
     name = "nodata"
     create_nodata_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")
@@ -30,5 +32,5 @@ def create_nodata_series(fname, name, target):
     neurodata.close()
 
 test_nodata_series()
-print "%s + passed" % __file__
+print "%s PASSED" % __file__
 

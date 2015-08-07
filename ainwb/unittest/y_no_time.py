@@ -8,7 +8,8 @@ import test_utils as ut
 # TESTS timeseries placement in acquisition, stimulus, templates
 
 def test_notime_series():
-    fname = "x_notime_series_acq.nwb"
+    #fname = "x_notime_series_acq.nwb"
+    fname = "x" + __file__[3:-3] + ".nwb"
     name = "notime"
     create_notime_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")
@@ -37,5 +38,5 @@ def create_notime_series(fname, name, target):
     neurodata.close()
 
 test_notime_series()
-print "%s + passed" % __file__
+print "%s PASSED" % __file__
 

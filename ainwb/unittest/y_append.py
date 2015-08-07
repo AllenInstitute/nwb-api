@@ -1,31 +1,35 @@
 #!/usr/bin/python
-import sys
-import nwb
 import test_utils as ut
+import nwb
 
-# test creation of annotation time series
-# TESTS AnnotationSeries creation
-# TESTS TimeSeries ancestry
+# test opening file in append mode
+# TESTS modifying existing file
+# TESTS creation of modification_time
 
-
-def test_annotation_series():
+def test_append():
     #fname = "x_annotation_series_acq.nwb"
     fname = "x" + __file__[3:-3] + ".nwb"
-    name = "annot"
-    create_annotation_series(fname, name, "acquisition")
-    ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")
-    ut.verify_timeseries(fname, name, "acquisition/timeseries", "AnnotationSeries")
-    create_annotation_series(fname, name, "stimulus")
-    ut.verify_timeseries(fname, name, "stimulus/presentation", "TimeSeries")
-    ut.verify_timeseries(fname, name, "stimulus/presentation", "AnnotationSeries")
+    name1 = "annot1"
+    name2 = "annot2"
+    create_annotation_series(fname, name1, "acquisition", True)
+    create_annotation_series(fname, name2, "acquisition", False)
+    ut.verify_timeseries(fname, name1, "acquisition/timeseries", "TimeSeries")
+    ut.verify_timeseries(fname, name1, "acquisition/timeseries", "AnnotationSeries")
+    ut.verify_timeseries(fname, name2, "acquisition/timeseries", "TimeSeries")
+    ut.verify_timeseries(fname, name2, "acquisition/timeseries", "AnnotationSeries")
+    ut.verify_attribute_present(fname, "file_create_date", "modification_time")
 
-def create_annotation_series(fname, name, target):
+
+def create_annotation_series(fname, name, target, newfile):
     settings = {}
     settings["filename"] = fname
-    settings["identifier"] = nwb.create_identifier("annotation example")
-    settings["overwrite"] = True
-    settings["start_time"] = "Sat Jul 04 2015 3:14:16"
-    settings["description"] = "Test file with AnnotationSeries"
+    if newfile:
+        settings["identifier"] = nwb.create_identifier("annotation example")
+        settings["overwrite"] = True
+        settings["start_time"] = "Sat Jul 04 2015 3:14:16"
+        settings["description"] = "Test file with AnnotationSeries"
+    else:
+        settings["modify"] = True
     neurodata = nwb.NWB(**settings)
     #
     annot = neurodata.create_timeseries("AnnotationSeries", name, target)
@@ -45,6 +49,6 @@ def create_annotation_series(fname, name, target):
     annot.finalize()
     neurodata.close()
 
-test_annotation_series()
+test_append()
 print "%s PASSED" % __file__
 

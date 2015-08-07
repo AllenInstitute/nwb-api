@@ -9,7 +9,7 @@ def print_error(context, err_string):
     print "----------------------------------------"
     print "**** Failed unit test %s" % inspect.stack()[0][1]
     print "**** Error in function '%s'" % func
-    print "Context of error: " + context
+    print "Context: " + context
     print "Error: " + err_string
     print "----------------------------------------"
     sys.exit(1)
@@ -126,7 +126,22 @@ def verify_present(hfile, group, field):
     except Exception as e:
         exc_error("Opening group", e)
     if field not in g:
-        error("verifying presence of '"+field+"'", "Field absent")
+        error("Verifying presence of '"+field+"'", "Field absent")
+    f.close()
+
+def verify_attribute_present(hfile, obj, field):
+    """ verify that a field is present
+    """ 
+    try:
+        f = h5py.File(hfile, 'r')
+    except IOError as e:
+        exc_error("Opening file", e)
+    try:
+        g = f[obj]
+    except Exception as e:
+        exc_error("Fetching object", e)
+    if field not in g.attrs:
+        error("Verifying presence of attribute '"+field+"'", "Field absent")
     f.close()
 
 def verify_absent(hfile, group, field):
@@ -141,6 +156,6 @@ def verify_absent(hfile, group, field):
     except Exception as e:
         exc_error("Opening group", e)
     if field in g:
-        error("verifying absence of '"+field+"'", "Field exists")
+        error("Verifying absence of '"+field+"'", "Field exists")
     f.close()
 
