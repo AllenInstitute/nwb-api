@@ -1,0 +1,146 @@
+import h5py
+import numpy as np
+import sys
+import traceback
+import inspect
+
+def print_error(context, err_string):
+    func = traceback.extract_stack()[-3][2]
+    print "----------------------------------------"
+    print "**** Failed unit test %s" % inspect.stack()[0][1]
+    print "**** Error in function '%s'" % func
+    print "Context of error: " + context
+    print "Error: " + err_string
+    print "----------------------------------------"
+    sys.exit(1)
+
+def error(context, err_string):
+    print_error(context, err_string)
+
+def exc_error(context, exc):
+    print_error(context, str(exc))
+
+def search_for_string(h5_str, value):
+    match = False
+    if h5_str is not None:
+        if isinstance(h5_str, (str, np.string_)):
+            if h5_str == value:
+                match = True
+        elif isinstance(h5_str, (list, np.ndarray)):
+            match = False
+            for i in range(len(h5_str)):
+                if h5_str[i] == value:
+                    match = True
+                    break
+    return match
+
+def search_for_substring(h5_str, value):
+    match = False
+    if h5_str is not None:
+        if isinstance(h5_str, (str, np.string_)):
+            if str(h5_str).find(value) >= 0:
+                match = True
+        elif isinstance(h5_str, (list, np.ndarray)):
+            match = False
+            for i in range(len(h5_str)):
+                if str(h5_str[i]).find(value) >= 0:
+                    match = True
+                    break
+    return match
+
+def verify_timeseries(hfile, name, location, ts_type):
+    """ verify that a time series is valid
+
+        makes sure that the entity with this name at the specified path
+        has the minimum required fields for being a time series,
+        that it is labeled as one, and that its ancestry is correct
+
+        Arguments:
+            hfile (text) name of nwb file (include path)
+            
+            name (text) name of time series
+
+            location (text) path in HDF5 file
+
+            ts_type (text) class name of time series to check for
+            (eg, AnnotationSeries)
+
+        Returns:
+            *nothing*
+    """ 
+    try:
+        f = h5py.File(hfile, 'r')
+    except IOError as e:
+        exc_error("Opening file", e)
+    try:
+        g = f[location]
+    except Exception as e:
+        exc_error("Opening group", e)
+    try:
+        ts = g[name]
+    except Exception as e:
+        exc_error("Fetching time series", e)
+    try:
+        nd_type = ts.attrs["neurodata_type"]
+    except Exception as e:
+        exc_error("reading neurodata_type", e)
+    if nd_type != "TimeSeries":
+        error("checking neurodata type", "Unexpectedly found type %s, expected 'TimeSeries'")
+    try:
+        anc = ts.attrs["ancestry"]
+    except Exception as e:
+        exc_error("Reading ancestry", e)
+    if not search_for_string(anc, ts_type):
+        error("Checking ancestry", "Time series is not of type " + ts_type)
+    missing = None
+    if "missing_fields" in ts.attrs:
+        missing = ts.attrs["missing_fields"]
+    try:
+        samp = ts["num_samples"].value
+    except Exception as e:
+        if not search_for_substring(missing, "num_samples"):
+            error("Reading number of samples", e)
+    try:
+        samp = ts["data"].value
+    except Exception as e:
+        if not search_for_substring(missing, "data"):
+            error("Reading data", e)
+    try:
+        samp = ts["timestamps"].value
+    except Exception as e:
+        if "starting_time" not in ts:
+            if not search_for_substring(missing, "timestamps"):
+                error("Reading timestamps", e)
+    f.close()
+            
+
+def verify_present(hfile, group, field):
+    """ verify that a field is present
+    """ 
+    try:
+        f = h5py.File(hfile, 'r')
+    except IOError as e:
+        exc_error("Opening file", e)
+    try:
+        g = f[group]
+    except Exception as e:
+        exc_error("Opening group", e)
+    if field not in g:
+        error("verifying presence of '"+field+"'", "Field absent")
+    f.close()
+
+def verify_absent(hfile, group, field):
+    """ verify that a field is not present
+    """ 
+    try:
+        f = h5py.File(hfile, 'r')
+    except IOError as e:
+        exc_error("Opening file", e)
+    try:
+        g = f[group]
+    except Exception as e:
+        exc_error("Opening group", e)
+    if field in g:
+        error("verifying absence of '"+field+"'", "Field exists")
+    f.close()
+
