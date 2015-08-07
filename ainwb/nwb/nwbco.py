@@ -116,6 +116,8 @@ def INTRA_ELECTRODE_CUSTOM(electrode, name):
 ########################################################################
 # for optophysiology imaging
 
+def IMAGE_CUSTOM(name):
+    return "optophysiology/" + name
 def IMAGE_SITE_DESCRIPTION(site):
     return "optophysiology/" + site + "/description"
 def IMAGE_SITE_MANIFOLD(site):
