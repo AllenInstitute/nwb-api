@@ -491,7 +491,6 @@ class TimeSeries(object):
         assert "_description" in spec
         spec["_attributes"]["help"]["_value"] = spec["_description"]
         # make sure that mandatory attributes are present
-        print "______"
         lspec = []
         lspec.append(spec)
         if "_value" in spec["data"]:

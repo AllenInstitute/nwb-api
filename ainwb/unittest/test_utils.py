@@ -106,7 +106,7 @@ def verify_timeseries(hfile, name, location, ts_type):
         samp = ts["data"].value
     except Exception as e:
         if not search_for_substring(missing, "data"):
-            error("Reading data", e)
+            exc_error("Reading data", e)
     try:
         samp = ts["timestamps"].value
     except Exception as e:
