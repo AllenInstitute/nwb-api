@@ -22,28 +22,28 @@ def test_ts_link():
     ut.verify_present(fname, "stimulus/presentation/root2", "data")
     # make sure link is documented
     val = ut.verify_attribute_present(fname, "stimulus/presentation/root2", "data_link")
-    if ut.search_for_string(val, "root1") < 0:
+    if not ut.search_for_substring(val, "root1"):
         ut.error("Checking attribute data_link", "Name missing")
-    if ut.search_for_string(val, "root2") < 0:
+    if not ut.search_for_substring(val, "root2"):
         ut.error("Checking attribute data_link", "Name missing")
     val = ut.verify_attribute_present(fname, "stimulus/templates/root1", "data_link")
-    if ut.search_for_string(val, "root1") < 0:
+    if not ut.search_for_substring(val, "root1"):
         ut.error("Checking attribute data_link", "Name missing")
-    if ut.search_for_string(val, "root2") < 0:
+    if not ut.search_for_substring(val, "root2"):
         ut.error("Checking attribute data_link", "Name missing")
     ##################################################
     # make sure timestamps is present in ts using link
     ut.verify_present(fname, "acquisition/timeseries/root3", "timestamps")
     # make sure link is documented
     val = ut.verify_attribute_present(fname, "stimulus/presentation/root2", "timestamp_link")
-    if ut.search_for_string(val, "root2") < 0:
+    if not ut.search_for_substring(val, "root2"):
         ut.error("Checking attribute timestamp_link", "Name missing")
-    if ut.search_for_string(val, "root3") < 0:
+    if not ut.search_for_substring(val, "root3"):
         ut.error("Checking attribute timestamp_link", "Name missing")
     val = ut.verify_attribute_present(fname, "acquisition/timeseries/root3", "timestamp_link")
-    if ut.search_for_string(val, "root2") < 0:
+    if not ut.search_for_substring(val, "root2"):
         ut.error("Checking attribute timestamp_link", "Name missing")
-    if ut.search_for_string(val, "root3") < 0:
+    if not ut.search_for_substring(val, "root3"):
         ut.error("Checking attribute timestamp_link", "Name missing")
 
 def create_linked_series(fname, root):

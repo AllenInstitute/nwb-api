@@ -142,7 +142,9 @@ def verify_attribute_present(hfile, obj, field):
         exc_error("Fetching object", e)
     if field not in g.attrs:
         error("Verifying presence of attribute '"+field+"'", "Field absent")
+    val = g.attrs[field]
     f.close()
+    return val
 
 def verify_absent(hfile, group, field):
     """ verify that a field is not present
