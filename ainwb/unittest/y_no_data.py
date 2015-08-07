@@ -9,7 +9,6 @@ import test_utils as ut
 def test_nodata_series():
     #fname = "x_nodata_series_acq.nwb"
     fname = "x" + __file__[3:-3] + ".nwb"
-    print fname
     name = "nodata"
     create_nodata_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")

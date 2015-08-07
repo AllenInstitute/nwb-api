@@ -5,6 +5,8 @@ import nwb
 # test opening file in append mode
 # TESTS modifying existing file
 # TESTS creation of modification_time
+# TESTS addition of TimeSeries to existing file
+# TESTS preservation of TimeSeries when file modified
 
 def test_append():
     #fname = "x_annotation_series_acq.nwb"
