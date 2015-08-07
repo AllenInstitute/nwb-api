@@ -453,7 +453,7 @@ class TimeSeries(object):
                 # make tmp short name to avoid passing 80-col limit in editor
                 tdat = spec["timestamps"] 
                 spec["num_samples"]["_value"] = len(tdat["_value"])
-        # document missing required fields
+        # document missing standard fields
         err_str = []
         missing_fields = []
         for k in spec.keys():
@@ -491,10 +491,20 @@ class TimeSeries(object):
         assert "_description" in spec
         spec["_attributes"]["help"]["_value"] = spec["_description"]
         # make sure that mandatory attributes are present
-        for k in spec["_attributes"]:
-            if spec["_attributes"][k]["_include"] == "required":
-                if "_value" not in spec["_attributes"][k]:
-                    err_str.append("Missing attribute " + k)
+        print "______"
+        lspec = []
+        lspec.append(spec)
+        if "_value" in spec["data"]:
+            lspec.append(spec["data"])
+        if "_value" in spec["timestamps"]:
+            lspec.append(spec["timestamps"])
+        if "_value" in spec["starting_time"]:
+            lspec.append(spec["starting_time"])
+        for i in range(len(lspec)):
+            for k in lspec[i]["_attributes"]:
+                if lspec[i]["_attributes"][k]["_include"] == "required":
+                    if "_value" not in lspec[i]["_attributes"][k]:
+                        err_str.append("Missing attribute: " + k)
         # report missing standard data
         if len(missing_fields) > 0:
             print "Warning -- '%s' is missing the following:" % self.full_path()
