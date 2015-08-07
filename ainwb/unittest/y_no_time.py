@@ -32,7 +32,7 @@ def create_notime_series(fname, name, target):
     #
     notime = neurodata.create_timeseries("TimeSeries", name, target)
     notime.ignore_time()
-    notime.set_data([0])
+    notime.set_data([0], unit="n/a", conversion=1, resolution=1)
     #
     notime.finalize()
     neurodata.close()

@@ -64,7 +64,7 @@ def create_linked_series(fname, root):
     first = neurodata.create_timeseries("TimeSeries", root+"1", "template")
     first.ignore_time()
     first.set_value("num_samples", 1)
-    first.set_data([1])
+    first.set_data([1], unit="parsec", conversion=1, resolution=1e-12)
     first.finalize()
     #
     second = neurodata.create_timeseries("TimeSeries", root+"2", "stimulus")
@@ -76,7 +76,7 @@ def create_linked_series(fname, root):
     third = neurodata.create_timeseries("TimeSeries", root+"3", "acquisition")
     third.set_time_as_link(second)
     third.set_value("num_samples", 1)
-    third.set_data([3])
+    third.set_data([3], unit="parsec", conversion=1, resolution=1e-9)
     third.finalize()
     #
     neurodata.close()

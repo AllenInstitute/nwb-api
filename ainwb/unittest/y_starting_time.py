@@ -28,7 +28,7 @@ def create_startingtime_series(fname, name, target):
     neurodata = nwb.NWB(**settings)
     #
     stime = neurodata.create_timeseries("TimeSeries", name, target)
-    stime.set_data([0, 1, 2, 3])
+    stime.set_data([0, 1, 2, 3], unit="n/a", conversion=1, resolution=1)
     stime.set_value("num_samples", 4)
     stime.set_time_by_rate(0.125, 2)
     #
