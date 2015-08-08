@@ -69,7 +69,7 @@ neurodata.set_metadata(EXTRA_SHANK_LOCATION("p1"), "CA3, left hemisphere, stereo
 # create time series with all electrode data stored together
 quad = neurodata.create_timeseries("ElectricalSeries", "quad", "acquisition")
 quad.set_comment("Data corresponds to four electrodes (two probes)")
-quad.set_data(np.zeros((10000, 4)))
+quad.set_data(np.zeros((10000, 4)), resolution=1.2345e-6)
 quad.set_time(np.arange(10000) * 0.0001)
 # indicate that we're recording from the first electrode defined in the
 #   above map (electrode numbers start at zero, so electrodes are 
@@ -115,7 +115,7 @@ for i in range(20):
     t.append(last)
 # 
 spike.set_time(t)
-spike.set_data(data)
+spike.set_data(data, resolution=1.2345e-6)
 # if data were stored in another unit such as microvolts, it would be
 #   necessary to specify a converstion between that unit and Volts.
 #   that would be done using the following:

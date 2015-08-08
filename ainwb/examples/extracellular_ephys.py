@@ -73,7 +73,9 @@ data = np.zeros(10000)
 # create time series with single electrode
 single = neurodata.create_timeseries("ElectricalSeries", "mono", "acquisition")
 single.set_comment("Data corresponds to recording from a single electrode")
-single.set_data(data)
+# resolution is the magnitude distance between least-significant bits
+#   (eg, volts-per-bit)
+single.set_data(data, resolution=1.2345e-6)
 single.set_time(timestamps)
 # indicate that we're recording from the first electrode defined in the
 #   above map (electrode numbers start at zero, so electrodes are 
@@ -86,7 +88,7 @@ single.finalize()
 # here is a time series storing data from a single probe (ie, 2 electrodes)
 double = neurodata.create_timeseries("ElectricalSeries", "duo", "acquisition")
 double.set_comment("Data corresponds to two electrodes (one probe)")
-double.set_data(np.zeros((10000, 2)))
+double.set_data(np.zeros((10000, 2)), resolution=1.2345e-6)
 # timestamps were already stored in the 'single' time series. we can link
 #   to that instance, which saves space
 double.set_time_as_link(single)
@@ -102,7 +104,7 @@ double.finalize()
 # here is a time series storing data from both probes together
 quad = neurodata.create_timeseries("ElectricalSeries", "quad", "acquisition")
 quad.set_comment("Data corresponds to four electrodes (two probes)")
-quad.set_data(np.zeros((10000, 4)))
+quad.set_data(np.zeros((10000, 4)), resolution=1.2345e-6)
 quad.set_time_as_link(single)
 quad.set_value("num_samples", len(timestamps))
 quad.set_value("electrode_idx", [0, 1, 2, 3])

@@ -203,7 +203,6 @@
 		}
       }
     },
-
     "IntervalSeries" : 
     {
       "_superclass" : "TimeSeries",
@@ -211,7 +210,13 @@
       "data" :
       {
         "_datatype" : "int8",
-        "_description" : "Interval start and stop times -- positive value (+1) means interval start, negative (-1) is end)"
+        "_description" : "Interval start and stop times -- positive value (+1) means interval start, negative (-1) is end)",
+		"_attributes" :
+		{
+		  "unit" : { "_value" : "start/stop" },
+		  "conversion" : { "_value" : "1" },
+		  "resolution" : { "_value" : "1" }
+		}
       }
     },
 
@@ -448,7 +453,13 @@
         "_description" : "Features of an applied stimulus. This is useful when storing the raw stimulus is impractical",
       "data" :
       {
-      "_datatype" : "f4"
+        "_datatype" : "f4",
+		"_attributes" :
+		{
+		  "unit" : { "_value" : "see 'feature_units'" },
+		  "conversion" : { "_value" : "1" },
+		  "resolution" : { "_value" : "0" }
+		}
       },
       "features" :
       {

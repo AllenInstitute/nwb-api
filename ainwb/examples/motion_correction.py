@@ -116,7 +116,7 @@ orig.finalize()
 # store the pixel delta for each frame in the source stack
 xy = neurodata.create_timeseries("TimeSeries", "x,y adjustments")
 xy.set_description("X,Y adjustments to original image necessary for registration")
-xy.set_data([[1.23, -3.45], [3.14, 2.18], [-4.2, 1.35]])
+xy.set_data([[1.23, -3.45], [3.14, 2.18], [-4.2, 1.35]], unit="pixels", conversion=1, resolution=1)
 xy.set_time_as_link(orig)
 # setting time as link also requires setting number of samples manually 
 #   FIXME
