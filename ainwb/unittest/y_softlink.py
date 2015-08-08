@@ -4,7 +4,7 @@ import nwb
 import test_utils as ut
 
 # creates time series without 'data' field
-# TESTS TimeSeries.ignore_data()
+# TESTS softlink of TimeSeries.data
 
 def test_softlink():
     #fname = "x_nodata_series_acq.nwb"
