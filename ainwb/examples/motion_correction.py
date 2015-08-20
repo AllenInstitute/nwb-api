@@ -97,7 +97,7 @@ orig.set_value("pmt_gain", 1.0)
 # field of view is in meters
 orig.set_value("field_of_view", [0.0003, 0.0003])
 # imaging plane value is the site/imaging-plane defined as metadata above
-orig.set_value("imaging_plane", "cameria1")
+orig.set_value("imaging_plane", "camera1")
 orig.set_value("scan_line_rate", 16000)
 ###########################
 # store time -- this example has 3 frames
