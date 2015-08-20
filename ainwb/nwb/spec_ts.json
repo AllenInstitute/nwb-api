@@ -646,14 +646,7 @@
         "_description" : "Name of entry in general/optophysiology describing details about this imaging plane",
         "_include" : "standard",
         "_linkto" : "general/optophysiology"
-      },
-	  "channel_name" : 
-	  {
-        "_datatype" : "str",
-        "_description" : "Name of entry in general/optophysiology/<imaging_plane> describing this channel",
-        "_include" : "standard",
-        "_linkto" : "general/optophysiology/<imaginge_plane>/"
-	  }
+      }
     },
     "WidefieldSeries" :
     {
