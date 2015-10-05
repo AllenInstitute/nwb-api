@@ -144,6 +144,49 @@ def write_json(fname, js):
         json.dump(js, f, indent=2)
         f.close()
 
+# it is too easy to create an object and forget to finalize it
+# keep track of when each object is created and finalized, and
+#   provide a way to detect when finalization doesnt occur
+serial_number = 0
+object_register = {}
+def register_creation(name):
+    global serial_number, object_register
+    num = serial_number
+    object_register[str(num)] = name
+    serial_number += 1
+    return num
+
+def register_finalization(name, num):
+    global object_register
+    if str(num) not in object_register:
+        print "Serial number error (SN=%d)" % num
+        print "Object '" + name + "' declared final but was never registered"
+        print "Stack trace follows"
+        print "-------------------"
+        traceback.print_stack()
+        sys.exit(1)
+    if object_register[str(num)] is None:
+        print "Object '" + name + "' finalized multiple times"
+        print "Stack trace follows"
+        print "-------------------"
+        traceback.print_stack()
+        sys.exit(1)
+    object_register[str(num)] = None
+
+def check_finalization():
+    global object_register, serial_number
+    err = False
+    for k, v in object_register.iteritems():
+        if v is not None:
+            if not err:
+                print "----------------------------------"
+                print "Finalization error"
+            err = True
+            print "    object '"+v+"' was not finalized"
+    if err:
+        sys.exit(1)
+    
+
 # TODO some functionality will be broken on append operations. in particular
 #   when an attribute stores a list of links, that list will not be
 #   properly updated if new links are created during append  FIXME
@@ -235,6 +278,12 @@ class NWB(object):
         self.ts_time_link_lists = {}
         # to track softlinks
         self.ts_time_softlinks = {}
+        # undocumented feature -- automatically close file on exit
+        # this is to avoid case where user forgets to call 'close()'
+        #   and can't figure out why resulting file is broken
+        import atexit
+        atexit.register(self.close)
+        self.is_open = True
 
     # internal API function to process constructor arguments
     def read_arguments(self, **vargs):
@@ -386,6 +435,9 @@ class NWB(object):
             Returns:
                 Nothing
         """
+        if not self.is_open:
+            return
+        self.is_open = False
         # finalize all time series
         # this will be a no-op for series that have already been finalized
         for i in range(len(self.ts_list)):
@@ -409,6 +461,8 @@ class NWB(object):
         for k in self.epoch_tag_dict:
             tags.append(k)
         self.file_pointer["epochs"].attrs["tags"] = np.string_(tags)
+        # make sure there are no registered objects that aren't finalized
+        check_finalization()
         # write out metadata
         self.write_metadata()
         # close file
@@ -542,6 +596,7 @@ class NWB(object):
         spec = self.spec["Epoch"]
         epo = nwbep.Epoch(name, self, start, stop, spec)
         self.epoch_list.append(epo)
+        epo.serial_num = register_creation("Epoch -- " + name)
         return epo
 
     def create_timeseries(self, ts_type, name, modality="other"):
@@ -649,6 +704,7 @@ class NWB(object):
         else:
             ts = nwbts.TimeSeries(name, modality, ts_defn, self)
         self.ts_list.append(ts)
+        ts.serial_num = register_creation(ts_type + " -- " + name)
         return ts
 
     # internal API call to get specification of time series from config file
@@ -689,6 +745,7 @@ class NWB(object):
         """
         mod = nwbmo.Module(name, self, self.spec["Module"])
         self.modules.append(mod)
+        mod.serial_num = register_creation("Module -- " + name)
         return mod
 
     def set_metadata(self, key, value, **attrs):

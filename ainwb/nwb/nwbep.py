@@ -76,6 +76,7 @@ class Epoch(object):
         if self.name in nwb.file_pointer["epochs"]:
             nwb.fatal_error("Epoch %s already exists" % self.name)
         epoch = nwb.file_pointer["epochs"].create_group(self.name)
+        self.serial_num = -1
         self.finalized = False
 
     def set_description(self, desc):
@@ -295,6 +296,9 @@ class Epoch(object):
         # write content to file
         grp = self.nwb.file_pointer["epochs/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
+        #
+        import nwb
+        nwb.register_finalization(self.name, self.serial_num);
         # flag ourself as done
         self.finalized = True
 

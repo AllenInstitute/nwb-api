@@ -73,6 +73,7 @@ class TimeSeries(object):
         self.time_tgt_path = None
         self.data_tgt_path = None
         self.data_tgt_path_soft = None
+        self.serial_num = -1
 
     # internal function
     def fatal_error(self, msg):
@@ -436,6 +437,8 @@ class TimeSeries(object):
         """
         if self.finalized:
             return
+        import nwb
+        nwb.register_finalization(self.name, self.serial_num)
         # tell kernel about link so table of all links can be added to
         #   file at end
         if self.data_tgt_path_soft is not None:

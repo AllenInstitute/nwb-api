@@ -56,6 +56,7 @@ class Module(object):
         if name in folder:
             nwb.fatal_error("Module '%s' already exists" % name)
         self.mod_folder = folder.create_group(self.name)
+        self.serial_num = -1
         # 
         self.finalized = False
 
@@ -146,6 +147,8 @@ class Module(object):
         else:
             iface = Interface(iface_type, self, if_spec)
         self.ifaces[iface_type] = iface
+        import nwb
+        iface.serial_num = nwb.register_creation("Interface -- " + iface_type)
         return iface
 
     # internal function
@@ -211,6 +214,8 @@ class Module(object):
         # write own data
         grp = self.nwb.file_pointer["processing/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
+        import nwb
+        nwb.register_finalization(self.name, self.serial_num)
 
 
 class Interface(object):
@@ -239,6 +244,7 @@ class Interface(object):
         if name in module.mod_folder:
             self.nwb.fatal_error("Interface %s already exists in module %s" % (name, module.name))
         self.iface_folder = module.mod_folder.create_group(name)
+        self.serial_num = -1
         self.finalized = False
 
     def full_path(self):
@@ -446,6 +452,8 @@ class Interface(object):
                 links = grp.attrs["timeseries_links"] + links
                 del grp.attrs["timeseries_links"]
             grp.attrs["timeseries_links"] = links
+        import nwb
+        nwb.register_finalization(self.module.name + "::" + self.name, self.serial_num)
 
 ########################################################################
 
