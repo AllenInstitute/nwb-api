@@ -372,7 +372,8 @@ class NWB(object):
         fp.create_dataset("nwb_version", data=FILE_VERSION_STR)
         fp.create_dataset("identifier", data=self.file_identifier)
         fp.create_dataset("session_description", data=self.session_description)
-        fp.create_dataset("file_create_date", data=time.ctime())
+        cur_time = time.ctime()
+        fp.create_dataset("file_create_date", data=[cur_time], maxshape=(None,), chunks=True)
         fp.create_dataset("session_start_time", data=np.string_(self.start_time))
         # create file skeleton
         hgen = fp.create_group("general")
@@ -409,13 +410,22 @@ class NWB(object):
         fp = self.file_pointer
         # TODO verify version
         # append timestamp to file create date's modification attribute
+        # modification_time is deprecated. this will be removed in a
+        #   future version. keep history of modification times in 
+        #   file_create_date
+        new_time = time.ctime()
         create = fp["file_create_date"]
+        entries = len(create)
+        create.resize((entries+1,))
+        create[entries] = new_time
+
         mod_time = []
         if "modification_time" in create.attrs:
             mod_time = create.attrs["modification_time"]
-        if type(mod_time).__name__ == "ndarray":
+        if isinstance(mod_time, (np.ndarray)):
+        #if type(mod_time).__name__ == "ndarray":
             mod_time = mod_time.tolist()
-        mod_time.append(np.string_(time.ctime()))
+        mod_time.append(np.string_(new_time))
         create.attrs["modification_time"] = mod_time
 
     # internal function that pushes metadata to the file on file closing
