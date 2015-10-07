@@ -406,21 +406,6 @@
           }
         }
       },
-      "resistance_compensation" :
-      {
-        "_datatype" : "f4",
-        "_description" : "",
-        "_include" : "standard",
-        "_attributes" :
-        {
-          "unit" :
-          {
-            "_datatype" : "str",
-            "_include" : "required",
-            "_value" : "Ohms"
-          }
-        }
-      },
       "gain" :
       {
         "_datatype" : "f4",
@@ -644,7 +629,7 @@
       {
         "_datatype" : "str",
         "_description" : "Name of entry in general/optophysiology describing details about this imaging plane",
-        "_include" : "standard",
+        "_include" : "required",
         "_linkto" : "general/optophysiology"
       }
     },

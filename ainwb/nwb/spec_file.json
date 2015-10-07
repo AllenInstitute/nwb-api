@@ -29,7 +29,7 @@
         "modification_time" :
         {
           "_datatype" : "text",
-          "_description" : "Array storing all subsequent modification dates",
+          "_description" : "Array storing all subsequent modification dates. Deprecated as of 1.0.1",
           "_include" : "optional"
         }
       }

@@ -49,7 +49,7 @@ import nwbmo
 
 VERS_MAJOR = 1
 VERS_MINOR = 0
-VERS_PATCH = 0
+VERS_PATCH = 1
 
 __version__ = "%d.%d.%d" % (VERS_MAJOR, VERS_MINOR, VERS_PATCH)
 FILE_VERSION_STR = "NWB-%s" % __version__
