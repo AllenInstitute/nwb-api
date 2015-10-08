@@ -401,12 +401,6 @@ _comp&#8221;, ...)</td>
 ...)</td>
 <td>Unit: Farads</td>
 </tr>
-<tr class="row-odd"><td>resistance_compensation
-<em>(float)</em></td>
-<td>set_value(&#8220;resistance_compensation&#8221;,
-...)</td>
-<td>Unit: Ohms</td>
-</tr>
 <tr class="row-even"><td>gain <em>(float)</em></td>
 <td>set_value(&#8220;gain&#8221;, ...)</td>
 <td>Unit: Volt/Volt</td>
@@ -677,7 +671,7 @@ depends on which class of TimeSeries is being used</p>
 <dd><p class="first"><em>data</em> (user-defined) Array of data samples stored in time series</p>
 <p><em>unit</em> (text) Base SI unit for data[] (eg, Amps, Volts)</p>
 <p><em>conversion</em> (float) Multiplier necessary to convert elements in data[] to specified unit</p>
-<p class="last"><em>resolution</em> (float) Minimum meaningful distance between elements in data[] (e.g., the +/- range, quantal step size between values, etc)</p>
+<p class="last"><em>resolution</em> (float) Minimum meaningful distance between elements in data[] (e.g., the +/- range, quantal step size between values, etc). If unknown, store NaN</p>
 </dd>
 <dt>Returns:</dt>
 <dd><em>nothing</em></dd>
