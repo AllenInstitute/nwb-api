@@ -34,5 +34,5 @@ def create_refimage(fname, name):
     neurodata.close()
 
 test_refimage_series()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

@@ -39,5 +39,5 @@ dates = f["file_create_date"]
 if len(dates) != 3:
     ut.error(__file__, "Expected 3 entries in file_create_date; found %d" % len(dates))
 
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

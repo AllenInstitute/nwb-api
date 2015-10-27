@@ -82,5 +82,5 @@ def create_linked_series(fname, root):
     neurodata.close()
 
 test_ts_link()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

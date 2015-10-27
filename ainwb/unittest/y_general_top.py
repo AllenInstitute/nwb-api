@@ -66,5 +66,5 @@ def create_general_top(fname):
     neurodata.close()
 
 test_general_top()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

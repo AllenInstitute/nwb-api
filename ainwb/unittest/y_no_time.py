@@ -38,5 +38,5 @@ def create_notime_series(fname, name, target):
     neurodata.close()
 
 test_notime_series()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

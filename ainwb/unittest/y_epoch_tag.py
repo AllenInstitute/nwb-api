@@ -39,5 +39,5 @@ for i in range(len(tags)):
         ut.error("Verifying epoch tag content", "All tags not present")
 
 
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

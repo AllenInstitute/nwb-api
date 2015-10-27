@@ -48,5 +48,5 @@ def create_softlink_source(fname, name, target):
     neurodata.close()
 
 test_softlink()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

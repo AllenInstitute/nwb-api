@@ -75,5 +75,5 @@ def create_general_extra(fname):
     neurodata.close()
 
 test_general_extra()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

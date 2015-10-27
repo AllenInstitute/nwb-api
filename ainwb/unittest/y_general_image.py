@@ -73,5 +73,5 @@ def create_general_intra(fname):
     neurodata.close()
 
 test_general_intra()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

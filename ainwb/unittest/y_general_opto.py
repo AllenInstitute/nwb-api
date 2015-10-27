@@ -50,5 +50,5 @@ def create_general_optogen(fname):
     neurodata.close()
 
 test_general_optogen()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

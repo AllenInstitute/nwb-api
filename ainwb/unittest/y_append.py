@@ -52,5 +52,5 @@ def create_annotation_series(fname, name, target, newfile):
     neurodata.close()
 
 test_append()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

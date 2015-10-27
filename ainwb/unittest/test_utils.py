@@ -7,14 +7,14 @@ import nwb
 
 def print_error(context, err_string):
     func = traceback.extract_stack()[-3][2]
-    print "----------------------------------------"
-    print "**** Failed unit test %s" % inspect.stack()[0][1]
-    print "**** Error in function '%s'" % func
-    print "Context: " + context
-    print "Error: " + err_string
-    print "Stack:"
+    print("----------------------------------------")
+    print("**** Failed unit test %s" % inspect.stack()[0][1])
+    print("**** Error in function '%s'" % func)
+    print("Context: " + context)
+    print("Error: " + err_string)
+    print("Stack:")
     traceback.print_stack()
-    print "----------------------------------------"
+    print("----------------------------------------")
     sys.exit(1)
 
 def error(context, err_string):

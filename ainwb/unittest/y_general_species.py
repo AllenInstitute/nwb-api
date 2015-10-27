@@ -44,5 +44,5 @@ def create_general_subject(fname):
     neurodata.close()
 
 test_general_subject()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 

@@ -31,5 +31,5 @@ def create_nodata_series(fname, name, target):
     neurodata.close()
 
 test_nodata_series()
-print "%s PASSED" % __file__
+print("%s PASSED" % __file__)
 
