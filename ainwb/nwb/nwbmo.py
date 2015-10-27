@@ -147,7 +147,7 @@ class Module(object):
         else:
             iface = Interface(iface_type, self, if_spec)
         self.ifaces[iface_type] = iface
-        import nwb
+        from . import nwb
         iface.serial_num = nwb.register_creation("Interface -- " + iface_type)
         return iface
 
@@ -157,7 +157,7 @@ class Module(object):
     def create_interface_definition(self, if_type):
         super_spec = copy.deepcopy(self.nwb.spec["Interface"]["SuperInterface"])
         if_spec = self.nwb.spec["Interface"][if_type]
-        import nwb
+        from . import nwb
         return nwb.recursive_dictionary_merge(super_spec, if_spec)
 
     def set_description(self, desc):
@@ -207,14 +207,14 @@ class Module(object):
         self.finalized = True
         # finalize interfaces
         iface_names = []
-        for k, v in self.ifaces.iteritems():
+        for k, v in self.ifaces.items():
             v.finalize()
             iface_names.append(v.name)
         self.spec["_attributes"]["interfaces"]["_value"] = iface_names
         # write own data
         grp = self.nwb.file_pointer["processing/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
-        import nwb
+        from . import nwb
         nwb.register_finalization(self.name, self.serial_num)
 
 
@@ -359,7 +359,7 @@ class Interface(object):
             path = value.full_path()
         elif isinstance(value, nwbmo.Interface):
             path = value.full_path()
-        elif isinstance(value, (str, unicode)):
+        elif isinstance(value, str):
             path = value
         else:
             self.fatal_error("Unrecognized type for setting up link -- found %s" % type(value))
@@ -396,7 +396,7 @@ class Interface(object):
             for i in range(len(reqd)):
                 tstype = reqd[i]
                 match = False
-                for name, ancestry in self.defined_timeseries.iteritems():
+                for name, ancestry in self.defined_timeseries.items():
                     for j in range(len(ancestry)):
                         if tstype == ancestry[j]:
                             match = True
@@ -405,7 +405,7 @@ class Interface(object):
                         break
                 # look for linked items
                 if not match:
-                    for name, path in self.linked_timeseries.iteritems():
+                    for name, path in self.linked_timeseries.items():
                         tgt = self.nwb.file_pointer[path]
                         ancestry = tgt.attrs["ancestry"]
                         for j in range(len(ancestry)):
@@ -417,7 +417,7 @@ class Interface(object):
                 if not match:
                     err_str += "Missing %s in interface %s\n" % (tstype, self.name)
         # check for mandatory fields
-        for k, v in self.spec.iteritems():
+        for k, v in self.spec.items():
             if k.startswith("_"):
                 continue
             if k == "[]" or k == "<>":
@@ -442,7 +442,7 @@ class Interface(object):
         self.nwb.write_datasets(grp, "", self.spec)
         # create linked objects manually
         links = []
-        for ts, path in self.linked_timeseries.iteritems():
+        for ts, path in self.linked_timeseries.items():
             grp[ts] = self.nwb.file_pointer[path]
             links.append(str(ts + " => " + path))
         if len(links) > 0:
@@ -452,7 +452,7 @@ class Interface(object):
                 links = grp.attrs["timeseries_links"] + links
                 del grp.attrs["timeseries_links"]
             grp.attrs["timeseries_links"] = links
-        import nwb
+        from . import nwb
         nwb.register_finalization(self.module.name + "::" + self.name, self.serial_num)
 
 ########################################################################
@@ -576,7 +576,7 @@ class Clustering(Interface):
             if n not in num_dict:
                 num_dict[n] = n
         num_array = []
-        for k in num_dict.keys():
+        for k in list(num_dict.keys()):
             num_array.append(int(k))
         num_array.sort()
         self.spec["cluster_nums"]["_value"] = num_array
@@ -723,7 +723,7 @@ class ImageSegmentation(Interface):
         if self.finalized:
             return
         # create roi_list for each plane
-        for plane, roi_list in self.roi_list.iteritems():
+        for plane, roi_list in self.roi_list.items():
             self.spec[plane]["roi_list"]["_value"] = roi_list
         # continue with normal finalization
         super(ImageSegmentation, self).finalize()
@@ -761,7 +761,7 @@ class MotionCorrection(Interface):
         """
         self.spec[name] = copy.deepcopy(self.spec["<>"])
         # create link to original object
-        import nwbts
+        from . import nwbts
         if isinstance(orig, nwbts.TimeSeries):
             if not orig.finalized:
                 self.nwb.fatal_error("Original timeseries must already be stored and finalized")
@@ -774,7 +774,7 @@ class MotionCorrection(Interface):
         # finalize other time series, or create link if a string was
         #   provided
         # XY translation
-        if isinstance(xy_translation, (str, unicode)):
+        if isinstance(xy_translation, str):
             self.spec[name]["xy_translation"]["_value_hardlink"] = xy_translation
             links += "; 'xy_translation' is '%s'" % xy_translation
         else:
@@ -788,7 +788,7 @@ class MotionCorrection(Interface):
                 xy_translation.reset_name("xy_translation")
                 xy_translation.finalize()
         # corrected series
-        if isinstance(corrected, (str, unicode)):
+        if isinstance(corrected, str):
             self.spec[name]["corrected"]["_value_hardlink"] = corrected
             links += "; 'corrected' is '%s'" % corrected
         else:

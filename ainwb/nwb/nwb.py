@@ -43,9 +43,9 @@ import collections
 import h5py
 import copy
 import numpy as np
-import nwbts
-import nwbep
-import nwbmo
+from . import nwbts
+from . import nwbep
+from . import nwbmo
 
 VERS_MAJOR = 1
 VERS_MINOR = 0
@@ -96,7 +96,7 @@ def load_json(fname):
             jin = json.load(f)
             f.close()
     except IOError:
-        print "Unable to load json file '%s'" % fname
+        print("Unable to load json file '%s'" % fname)
         sys.exit(1)
     return jin
 
@@ -109,7 +109,7 @@ def load_yaml(fname):
             jin = yaml.load(f)
             f.close()
     except IOError:
-        print "Unable to load json file '%s'" % fname
+        print("Unable to load json file '%s'" % fname)
         sys.exit(1)
     return jin
 
@@ -159,16 +159,16 @@ def register_creation(name):
 def register_finalization(name, num):
     global object_register
     if str(num) not in object_register:
-        print "Serial number error (SN=%d)" % num
-        print "Object '" + name + "' declared final but was never registered"
-        print "Stack trace follows"
-        print "-------------------"
+        print("Serial number error (SN=%d)" % num)
+        print("Object '" + name + "' declared final but was never registered")
+        print("Stack trace follows")
+        print("-------------------")
         traceback.print_stack()
         sys.exit(1)
     if object_register[str(num)] is None:
-        print "Object '" + name + "' finalized multiple times"
-        print "Stack trace follows"
-        print "-------------------"
+        print("Object '" + name + "' finalized multiple times")
+        print("Stack trace follows")
+        print("-------------------")
         traceback.print_stack()
         sys.exit(1)
     object_register[str(num)] = None
@@ -176,13 +176,13 @@ def register_finalization(name, num):
 def check_finalization():
     global object_register, serial_number
     err = False
-    for k, v in object_register.iteritems():
+    for k, v in object_register.items():
         if v is not None:
             if not err:
-                print "----------------------------------"
-                print "Finalization error"
+                print("----------------------------------")
+                print("Finalization error")
             err = True
-            print "    object '"+v+"' was not finalized"
+            print("    object '"+v+"' was not finalized")
     if err:
         sys.exit(1)
     
@@ -259,7 +259,7 @@ class NWB(object):
             elif "keep_original" in vargs and vargs["keep_original"]:
                 self.keep_original = True
             else:
-                print "File '%s' already exists. Specify 'modify=True' to open for writing" % self.file_name
+                print("File '%s' already exists. Specify 'modify=True' to open for writing" % self.file_name)
                 sys.exit(1)
         else:
             # create new file
@@ -332,14 +332,14 @@ class NWB(object):
             err_str += "    argument 'description' was not specified\n"
         # handle errors
         if len(err_str) > 0:
-            print "Error creating Borg object - missing constructor value(s)"
-            print err_str
+            print("Error creating Borg object - missing constructor value(s)")
+            print(err_str)
             sys.exit(1)
 
     def fatal_error(self, msg):
-        print "Error: " + msg
-        print "Stack trace follows"
-        print "-------------------"
+        print("Error: " + msg)
+        print("Stack trace follows")
+        print("-------------------")
         traceback.print_stack()
         sys.exit(1)
 
@@ -362,7 +362,7 @@ class NWB(object):
         try:
             self.file_pointer = h5py.File(self.tmp_name, "w")
         except IOError:
-            print "Unable to create output file '%s'" % self.tmp_name
+            print("Unable to create output file '%s'" % self.tmp_name)
             sys.exit(1)
         ################################################################
         # create skeleton
@@ -405,7 +405,7 @@ class NWB(object):
         try:
             self.file_pointer = h5py.File(self.tmp_name, "a")
         except IOError:
-            print "Unable to open temp output file '%s'" % self.tmp_name
+            print("Unable to open temp output file '%s'" % self.tmp_name)
             sys.exit(1)
         fp = self.file_pointer
         # TODO verify version
@@ -454,14 +454,14 @@ class NWB(object):
             self.ts_list[i].finalize()
         # after time series are finalized, go back and document links
         # TODO check to see if data_link and timestamp_link exist
-        for k, lst in self.ts_data_link_lists.iteritems():
+        for k, lst in self.ts_data_link_lists.items():
             for i in range(len(lst)):
                 self.file_pointer[lst[i]].attrs["data_link"] = np.string_(lst)
-        for k, lst in self.ts_time_link_lists.iteritems():
+        for k, lst in self.ts_time_link_lists.items():
             for i in range(len(lst)):
                 obj = self.file_pointer[lst[i]]
                 obj.attrs["timestamp_link"] = np.string_(lst)
-        for k, lnk in self.ts_time_softlinks.iteritems():
+        for k, lnk in self.ts_time_softlinks.items():
             self.file_pointer[k].attrs["data_softlink"] = np.string_(lnk)
         # TODO finalize all modules
         # finalize epochs and write epoch tag list to epoch group
@@ -807,7 +807,7 @@ class NWB(object):
         # handle attributes
         if "_attributes" not in spec:
             spec["_attributes"] = {}
-        for k, v in attrs.iteritems():
+        for k, v in attrs.items():
             if k not in spec["_attributes"]:
                 spec["_attributes"][k] = {}
             fld = spec["_attributes"][k]
@@ -899,12 +899,12 @@ class NWB(object):
                     self.fatal_error(m1 + m2)
             elif dtype.startswith('f'):
                 # check for type conversion error
-                if isinstance(value, (str, unicode)):
+                if isinstance(value, str):
                     raise ValueError
                 val = float(value)
             elif dtype.startswith('uint') or dtype.startswith('int'):
                 # check for type conversion error
-                if isinstance(value, (str, unicode)):
+                if isinstance(value, str):
                     raise ValueError
                 val = int(value)
             elif dtype != "unspecified":
@@ -920,7 +920,7 @@ class NWB(object):
     def set_value_internal(self, key, value, spec, name, dtype=None, **attrs):
         if isinstance(value, nwbts.TimeSeries):
             value = value.full_path()
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             value = str(value)
         # get field definition
         if key not in spec:
@@ -948,7 +948,7 @@ class NWB(object):
                 path = value.full_path()
             elif ftype == "timeseries" and isinstance(value, nwbts.TimeSeries):
                 path = value.full_path()
-            elif isinstance(value, (str, unicode)):
+            elif isinstance(value, str):
                 path = str(value)
             else:
                 self.fatal_error("Expected type %s, got %s" % (ftype, type(value)))
@@ -958,7 +958,7 @@ class NWB(object):
             # all done here
             return
         if field["_datatype"] == "unrestricted":
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, str):
                 field["_datatype"] = "str"
         # verify type, or set it if it's unrestricted and a float
         if field["_datatype"] == "unrestricted":
@@ -976,7 +976,7 @@ class NWB(object):
         else:
             self.check_type(key, value, field["_datatype"])
         field["_value"] = value
-        for k in attrs.keys():
+        for k in list(attrs.keys()):
             if k not in field["_attributes"]:
                 self.fatal_error("Custom attributes not supported -- '%s' is not part of field '%s'" %(k, key))
             spec_type = field["_attributes"][k]["_datatype"]
@@ -1086,7 +1086,7 @@ class NWB(object):
                 # convert unicode to string
                 # not internationalization-friendly, but 
                 #   makes first version easier
-                if isinstance(val, unicode):
+                if isinstance(val, str):
                     varg["dtype"] = 'str'
                     spec["_value"] = str(spec["_value"])
                 elif isinstance(val, str):
@@ -1096,7 +1096,7 @@ class NWB(object):
         elif isinstance(varg["data"], str):
             # string-handling logic below requires string dtype be labeled
             varg["dtype"] = 'str'
-        elif isinstance(varg["data"], unicode):
+        elif isinstance(varg["data"], str):
             # string-handling logic below requires string dtype be labeled
             varg["dtype"] = 'str'
             spec["_value"] = str(spec["_value"])

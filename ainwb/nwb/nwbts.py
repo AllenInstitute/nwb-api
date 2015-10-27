@@ -39,7 +39,7 @@ import h5py
 import copy
 import collections
 import numpy as np
-import nwbmo
+from . import nwbmo
 
 class TimeSeries(object):
     """ Standard TimeSeries constructor
@@ -77,10 +77,10 @@ class TimeSeries(object):
 
     # internal function
     def fatal_error(self, msg):
-        print "Error: " + msg
-        print "TimeSeries: " + self.name
-        print "Stack trace follows"
-        print "-------------------"
+        print("Error: " + msg)
+        print("TimeSeries: " + self.name)
+        print("Stack trace follows")
+        print("-------------------")
         traceback.print_stack()
         sys.exit(1)
 
@@ -135,7 +135,7 @@ class TimeSeries(object):
             path = value.full_path()
         elif isinstance(value, nwbmo.Interface):
             path = value.full_path()
-        elif isinstance(value, (str, unicode)):
+        elif isinstance(value, str):
             path = value
         else:
             self.fatal_error("Unrecognized type for setting up link -- found %s" % type(value))
@@ -150,9 +150,9 @@ class TimeSeries(object):
         if self.finalized:
             self.fatal_error("Added value after finalization")
         # check type
-        if not isinstance(target_file, (str, unicode)):
+        if not isinstance(target_file, str):
             self.fatal_error("File name must be string, received %s", type(target_file))
-        if not isinstance(dataset_path, (str, unicode)):
+        if not isinstance(dataset_path, str):
             self.fatal_error("Dataset path must be string, received %s", type(dataset_path))
         # TODO set _value_softlink fields
         self.set_value(key, "????")
@@ -437,7 +437,7 @@ class TimeSeries(object):
         """
         if self.finalized:
             return
-        import nwb
+        from . import nwb
         nwb.register_finalization(self.name, self.serial_num)
         # tell kernel about link so table of all links can be added to
         #   file at end
@@ -459,7 +459,7 @@ class TimeSeries(object):
         # document missing standard fields
         err_str = []
         missing_fields = []
-        for k in spec.keys():
+        for k in list(spec.keys()):
             if k.startswith('_'):   # check for leading underscore
                 continue    # control field -- ignore
             if "_value" in spec[k]:
@@ -509,18 +509,18 @@ class TimeSeries(object):
                         err_str.append("Missing attribute: " + k)
         # report missing standard data
         if len(missing_fields) > 0:
-            print "Warning -- '%s' is missing the following:" % self.full_path()
+            print("Warning -- '%s' is missing the following:" % self.full_path())
             for i in range(len(missing_fields)):
-                print "\t" + missing_fields[i]
+                print("\t" + missing_fields[i])
         # report errors for missing mandatory data
         if len(err_str) > 0:
-            print "TimeSeries creation error (name=%s; path=%s)" % (self.name, self.full_path())
+            print("TimeSeries creation error (name=%s; path=%s)" % (self.name, self.full_path()))
             if len(err_str) == 1:
-                print "Missing mandatory field:"
+                print("Missing mandatory field:")
             else:
-                print "Missing mandatory field(s):"
+                print("Missing mandatory field(s):")
             for i in range(len(err_str)):
-                print "\t" + err_str[i]
+                print("\t" + err_str[i])
             sys.exit(1)
         # TODO check _linkto
 
@@ -580,12 +580,12 @@ class AnnotationSeries(TimeSeries):
             return
         if len(self.annot_str) > 0:
             if "_value" in self.spec["data"]:
-                print "AnnotationSeries error -- can only call set_data() or add_annotation(), not both"
-                print "AnnotationSeries name: " + self.name
+                print("AnnotationSeries error -- can only call set_data() or add_annotation(), not both")
+                print("AnnotationSeries name: " + self.name)
                 sys.exit(1)
             if "_value" in self.spec["timestamps"]:
-                print "AnnotationSeries error -- can only call set_time() or add_annotation(), not both"
-                print "AnnotationSeries name: " + self.name
+                print("AnnotationSeries error -- can only call set_time() or add_annotation(), not both")
+                print("AnnotationSeries name: " + self.name)
                 sys.exit(1)
             self.spec["data"]["_value"] = self.annot_str
             self.spec["timestamps"]["_value"] = self.annot_time
@@ -617,9 +617,9 @@ class AbstractFeatureSeries(TimeSeries):
         """
         # sanlty checks
         # make sure both are arrays, not strings
-        if isinstance(names, (str, unicode)):
+        if isinstance(names, str):
             names = [ str(names) ]
-        if isinstance(units, (str, unicode)):
+        if isinstance(units, str):
             units = [ str(units) ]
         # make sure arrays are of same length
         if len(names) != len(units):

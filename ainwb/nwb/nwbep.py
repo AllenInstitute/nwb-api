@@ -37,7 +37,7 @@ import sys
 import copy
 import numpy as np
 import traceback
-import nwbts
+from . import nwbts
 
 class Epoch(object):
     """ Epoch object
@@ -171,7 +171,7 @@ class Epoch(object):
         epoch_ts = {}
         if isinstance(timeseries, nwbts.TimeSeries):
             timeseries_path = timeseries.full_path()
-        elif isinstance(timeseries, (str, unicode)):
+        elif isinstance(timeseries, str):
             timeseries_path = timeseries
         else:
             self.nwb.fatal_error("Don't recognize timeseries parameter as time series or path")
@@ -256,11 +256,11 @@ class Epoch(object):
             assert timestamps[i1] >= start and timestamps[i1] <= stop
             return i0, i1
         except AssertionError:
-            print "-------------------" + self.name
-            print "epoch: %f, %f" % (start, stop)
-            print "time: %f, %f" % (timestamps[0], timestamps[-1])
-            print "idx 0: %d\tt:%f" % (i0, timestamps[i0])
-            print "idx 1: %d\tt:%f" % (i1, timestamps[i1])
+            print("-------------------" + self.name)
+            print("epoch: %f, %f" % (start, stop))
+            print("time: %f, %f" % (timestamps[0], timestamps[-1]))
+            print("idx 0: %d\tt:%f" % (i0, timestamps[i0]))
+            print("idx 1: %d\tt:%f" % (i1, timestamps[i1]))
             assert False, "Internal error"
 
     def finalize(self):
@@ -282,7 +282,7 @@ class Epoch(object):
         fp = self.nwb.file_pointer
         epoch = fp["epochs"][self.name]
         # manually create time series references
-        for k in self.timeseries_dict.keys():
+        for k in list(self.timeseries_dict.keys()):
             ts = self.timeseries_dict[k]
             if k in epoch:
                 self.nwb.fatal_error("HDF5 object %s exists in epoch %s" % (k, self.name))
@@ -297,7 +297,7 @@ class Epoch(object):
         grp = self.nwb.file_pointer["epochs/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
         #
-        import nwb
+        from . import nwb
         nwb.register_finalization(self.name, self.serial_num);
         # flag ourself as done
         self.finalized = True
