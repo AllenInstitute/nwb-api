@@ -29,12 +29,6 @@
 			"_description" : "Intervals in epoch that should be ignored (eg, due electrical noise)",
 			"_include" : "required"
 		},
-		"tags" :
-		{
-			"_datatype" : "str",
-			"_description" : "User-defined annotations or tags to apply to epoch",
-			"_include" : "required"
-		},
         "[]" :
         {
           "_datatype" : "unrestricted",
@@ -90,6 +84,12 @@
               "_value" : "Epoch",
               "_include" : "required"
 			},
+		  "tags" :
+		  {
+		  	"_datatype" : "str",
+		  	"_description" : "User-defined annotations or tags to apply to epoch",
+		  	"_include" : "required"
+		  },
       "links" :
       {
         "_datatype" : "str",

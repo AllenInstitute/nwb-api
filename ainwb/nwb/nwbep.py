@@ -70,7 +70,7 @@ class Epoch(object):
         # intervals that are for ignoring data (eg, due noise)
         self.spec["ignore_intervals"]["_value"] = []
         # list of tags associated with epoch
-        self.spec["tags"]["_value"] = []
+        self.spec["_attributes"]["tags"]["_value"] = []
         self.spec["_attributes"]["links"]["_value"] = []
         # go ahead and create epoch folder now
         if self.name in nwb.file_pointer["epochs"]:
@@ -122,7 +122,7 @@ class Epoch(object):
             Returns:
                 *nothing*
         """
-        self.spec["tags"]["_value"].append(content)
+        self.spec["_attributes"]["tags"]["_value"].append(content)
 
     # limit intervals to time boundary of epoch, but don't perform 
     #   additional logic (ie, if user supplies overlapping intervals,
@@ -292,7 +292,7 @@ class Epoch(object):
             ets.create_dataset("idx_start", data=ts["start_idx"], dtype='i4')
             ets.create_dataset("count", data=ts["count"], dtype='i4')
         # report all tags to kernel so it can keep track of what was used
-        self.nwb.add_epoch_tags(self.spec["tags"]["_value"])
+        self.nwb.add_epoch_tags(self.spec["_attributes"]["tags"]["_value"])
         # write content to file
         grp = self.nwb.file_pointer["epochs/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)

@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import traceback
 import inspect
+import nwb
 
 def print_error(context, err_string):
     func = traceback.extract_stack()[-3][2]
@@ -168,4 +169,12 @@ def verify_absent(hfile, group, field):
     if field in g:
         error("Verifying absence of '"+field+"'", "Field exists")
     f.close()
+
+def create_new_file(fname, identifier):
+    settings = {}
+    settings["filename"] = fname
+    settings["identifier"] = nwb.create_identifier(identifier)
+    settings["overwrite"] = True
+    settings["description"] = "softlink test"
+    return nwb.NWB(**settings)
 
