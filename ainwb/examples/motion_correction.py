@@ -56,7 +56,7 @@ settings["start_time"] = "Sat Jul 04 2015 3:14:16"
 settings["description"] = "Test file demonstrating use of the MotionCorrection interface"
 
 # create the NWB object. this manages the file
-print "Creating " + settings["filename"]
+print("Creating " + settings["filename"])
 neurodata = nwb.NWB(**settings)
 
 ########################################################################
