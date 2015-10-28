@@ -1005,7 +1005,7 @@ class NWB(object):
                     #   then convert each to be a numpy string_
                     #if sys.version_info >= (3, 0):
                     x = attr[k]["_value"]
-                    if isinstance(x, (list)):
+                    if isinstance(x, (list)) and len(x) > 0:
                         while isinstance(x, (list)):
                             x = x[0]
                         if isinstance(x, (str)):
