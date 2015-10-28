@@ -32,7 +32,7 @@ def search_for_string(h5_str, value):
         elif isinstance(h5_str, (list, np.ndarray)):
             match = False
             for i in range(len(h5_str)):
-                if h5_str[i] == value:
+                if h5_str[i] == value or h5_str[i] == np.bytes_(value):
                     match = True
                     break
     return match
@@ -87,13 +87,14 @@ def verify_timeseries(hfile, name, location, ts_type):
         nd_type = ts.attrs["neurodata_type"]
     except Exception as e:
         exc_error("reading neurodata_type", e)
-    if nd_type != "TimeSeries":
-        error("checking neurodata type", "Unexpectedly found type %s, expected 'TimeSeries'")
+    if nd_type != b"TimeSeries" and nd_type != "TimeSeries":
+        error("checking neurodata type", "Unexpectedly found type %s, expected 'TimeSeries'" % nd_type)
     try:
         anc = ts.attrs["ancestry"]
     except Exception as e:
         exc_error("Reading ancestry", e)
     if not search_for_string(anc, ts_type):
+        print("ts_type is " + ts_type)
         error("Checking ancestry", "Time series is not of type " + ts_type)
     missing = None
     if "missing_fields" in ts.attrs:

@@ -1,3 +1,33 @@
+Project description below
+
+Install
+=======
+
+Instructions are provided to install the NWB library to the standard
+system package repository. Installation to non-standard locations
+will be different.
+
+python 2
+   system requirements:
+      numpy, h5py
+
+   as root, run:
+     python setup.py install
+
+python 3
+**NOTE: support for python3 not complete**
+   system requirements:
+      numpy, h5py, cython
+
+   as root, run:
+     python3 setup.py install
+
+
+
+Project description
+===================
+
+
 Neurodata Without Borders: Neurophysiology is a project to develop a
 unified data format for cellular-based neurophysiology data, focused on
 the dynamics of groups of neurons measured under a large range of

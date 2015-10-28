@@ -373,7 +373,8 @@ class NWB(object):
         fp.create_dataset("identifier", data=self.file_identifier)
         fp.create_dataset("session_description", data=self.session_description)
         cur_time = time.ctime()
-        fp.create_dataset("file_create_date", data=[cur_time], maxshape=(None,), chunks=True)
+        dt = h5py.special_dtype(vlen=bytes)
+        fp.create_dataset("file_create_date", data=[np.string_(cur_time)], maxshape=(None,), chunks=True, dtype=dt)
         fp.create_dataset("session_start_time", data=np.string_(self.start_time))
         # create file skeleton
         hgen = fp.create_group("general")
@@ -997,7 +998,36 @@ class NWB(object):
             if k == "<>" or k == "[]":
                 continue    # template
             if "_value" in attr[k]:
-                grp.attrs[k] = attr[k]["_value"]
+                try:
+                    # python 3 has different string handling
+                    # attribute writing restructured in attempt to
+                    #   compensate. If attribute is a list of strings
+                    #   then convert each to be a numpy string_
+                    #if sys.version_info >= (3, 0):
+                    x = attr[k]["_value"]
+                    if isinstance(x, (list)):
+                        while isinstance(x, (list)):
+                            x = x[0]
+                        if isinstance(x, (str)):
+                            # only handle array of lists
+                            if not isinstance(x[0], (str)):
+                                self.fatal_error("Multi-dimensional text arrays not presently supported in attributes (attr=%s)" % attr);
+                            # convert eacy string
+                            y = []
+                            x = attr[k]["_value"]
+                            for i in range(len(x)):
+                                y.append(np.string_(x[i]))
+                            attr[k]["_value"] = y
+                    elif isinstance(x, (str)):
+                        attr[k]["_value"] = np.string_(x)
+                    grp.attrs[k] = attr[k]["_value"]
+                except TypeError:
+                    print("*** Type error ***")
+                    print("Attribute " + k)
+                    print(attr[k]["_value"])
+                    print(type(attr[k]["_value"]))
+                    print(len(attr[k]["_value"]))
+                    raise
 
     # internal API function to create a dataset in the specified path,
     #   relative to the specified group. dataset is described in spec
@@ -1125,7 +1155,7 @@ class NWB(object):
                 dset = grp.create_dataset(**varg)
                 # space reserved for strings -- copy into place
                 for i in range(len(value)):
-                    dset[i] = value[i]
+                    dset[i] = np.string_(value[i])
             else:
                 varg["data"] = np.string_(value)
                 # don't specify dtype='str' -- h5py doesn't like that
