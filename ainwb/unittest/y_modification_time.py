@@ -7,7 +7,10 @@ import time
 
 # creates file and modifies it multiple times
 
-fname = "x" + __file__[3:-3] + ".nwb"
+if __file__.startswith("./"):
+    fname = "x" + __file__[3:-3] + ".nwb"
+else:
+    fname = "x" + __file__[1:-3] + ".nwb"
 
 settings = {}
 settings["filename"] = fname

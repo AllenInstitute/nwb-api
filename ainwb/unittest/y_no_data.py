@@ -7,8 +7,10 @@ import test_utils as ut
 # TESTS TimeSeries.ignore_data()
 
 def test_nodata_series():
-    #fname = "x_nodata_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     name = "nodata"
     create_nodata_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")

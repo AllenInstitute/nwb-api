@@ -11,8 +11,10 @@ def test_field(fname, name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_subject():
-    #fname = "x_nodata_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     create_general_subject(fname)
     val = ut.verify_present(fname, "general/subject/", "description")
     if not ut.strcmp(val, "SUBJECT"):

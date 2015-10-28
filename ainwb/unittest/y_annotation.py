@@ -9,8 +9,10 @@ import test_utils as ut
 
 
 def test_annotation_series():
-    #fname = "x_annotation_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     name = "annot"
     create_annotation_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")

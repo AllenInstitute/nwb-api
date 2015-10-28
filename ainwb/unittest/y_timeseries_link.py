@@ -12,8 +12,10 @@ import test_utils as ut
 
 
 def test_ts_link():
-    #fname = "x_nodata_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     root = "root"
     create_linked_series(fname, root)
     ut.verify_timeseries(fname, root+"1", "stimulus/templates", "TimeSeries")

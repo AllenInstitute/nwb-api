@@ -8,7 +8,10 @@ import test_utils as ut
 #   exactly the unique tags of each epoch and that each
 #   epoch contains the assigned tags
     
-fname = "x" + __file__[3:-3] + ".nwb"
+if __file__.startswith("./"):
+    fname = "x" + __file__[3:-3] + ".nwb"
+else:
+    fname = "x" + __file__[1:-3] + ".nwb"
 borg = ut.create_new_file(fname, "Epoch tags")
 
 tags = ["tag-a", "tag-b", "tag-c"]

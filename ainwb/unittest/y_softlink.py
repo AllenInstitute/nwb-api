@@ -7,9 +7,12 @@ import test_utils as ut
 # TESTS softlink of TimeSeries.data
 
 def test_softlink():
-    #fname = "x_nodata_series_acq.nwb"
-    fname1 = "x" + __file__[3:-3] + "1" + ".nwb"
-    fname2 = "x" + __file__[3:-3] + "2" + ".nwb"
+    if __file__.startswith("./"):
+        fname1 = "x" + __file__[3:-3] + "1" + ".nwb"
+        fname2 = "x" + __file__[3:-3] + "2" + ".nwb"
+    else:
+        fname1 = "x" + __file__[1:-3] + "1" + ".nwb"
+        fname2 = "x" + __file__[1:-3] + "2" + ".nwb"
     name1 = "softlink_source"
     name2 = "softlink_reader"
     create_softlink_source(fname1, name1, "acquisition")

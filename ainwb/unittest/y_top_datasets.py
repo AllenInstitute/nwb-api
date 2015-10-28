@@ -5,8 +5,10 @@ import test_utils as ut
 # TESTS top-level datasets
 
 def test_refimage_series():
-    #fname = "x_refimage_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     name = "refimage"
     create_refimage(fname, name)
     val = ut.verify_present(fname, "/", "identifier")

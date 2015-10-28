@@ -8,8 +8,10 @@ import test_utils as ut
 # TESTS timeseries placement in acquisition, stimulus, templates
 
 def test_notime_series():
-    #fname = "x_notime_series_acq.nwb"
-    fname = "x" + __file__[3:-3] + ".nwb"
+    if __file__.startswith("./"):
+        fname = "x" + __file__[3:-3] + ".nwb"
+    else:
+        fname = "x" + __file__[1:-3] + ".nwb"
     name = "notime"
     create_notime_series(fname, name, "acquisition")
     ut.verify_timeseries(fname, name, "acquisition/timeseries", "TimeSeries")
