@@ -15,7 +15,6 @@ python 2
      python setup.py install
 
 python 3
-**NOTE: support for python3 not complete**
    system requirements:
       numpy, h5py, cython
 
