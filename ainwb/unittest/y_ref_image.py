@@ -14,12 +14,10 @@ def test_refimage_series():
     if len(val) != 5:
         ut.error("Checking ref image contents", "wrong dimension")
     val = ut.verify_attribute_present(fname, "acquisition/images/"+name, "format")
-    #if val != "rawx":
-    if val != "raw":
+    if not ut.strcmp(val, "raw"):
         ut.error("Checking ref image format", "Wrong value")
     val = ut.verify_attribute_present(fname, "acquisition/images/"+name, "description")
-    #if val != "tests":
-    if val != "test":
+    if not ut.strcmp(val, "test"):
         ut.error("Checking ref image description", "Wrong value")
 
 def create_refimage(fname, name):

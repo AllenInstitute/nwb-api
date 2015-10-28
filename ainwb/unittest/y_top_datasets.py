@@ -10,17 +10,14 @@ def test_refimage_series():
     name = "refimage"
     create_refimage(fname, name)
     val = ut.verify_present(fname, "/", "identifier")
-    #if val != "vwxa":
-    if val != "vwx":
+    if not ut.strcmp(val, "vwx"):
         ut.error("Checking file idenfier", "wrong contents")
     val = ut.verify_present(fname, "/", "file_create_date")
     val = ut.verify_present(fname, "/", "session_start_time")
-    #if val != "xyza":
-    if val != "xyz":
+    if not ut.strcmp(val, "xyz"):
         ut.error("Checking session start time", "wrong contents")
     val = ut.verify_present(fname, "/", "session_description")
-    #if val != "wxya":
-    if val != "wxy":
+    if not ut.strcmp(val, "wxy"):
         ut.error("Checking session start time", "wrong contents")
 
 def create_refimage(fname, name):
