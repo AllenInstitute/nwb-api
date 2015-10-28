@@ -49,6 +49,8 @@ def search_for_substring(h5_str, value):
                 if str(h5_str[i]).find(value) >= 0:
                     match = True
                     break
+#    if not match and not isinstance(value, (np.bytes_)):
+#        return search_for_substring(h5_str, np.bytes_(value))
     return match
 
 def verify_timeseries(hfile, name, location, ts_type):
@@ -178,4 +180,9 @@ def create_new_file(fname, identifier):
     settings["overwrite"] = True
     settings["description"] = "softlink test"
     return nwb.NWB(**settings)
+
+def strcmp(s1, s2):
+    if s1 == s2 or s1 == np.bytes_(s2):
+        return True
+    return False
 

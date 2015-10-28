@@ -7,7 +7,7 @@ import test_utils as ut
 
 def test_field(fname, name, subdir):
     val = ut.verify_present(fname, "general/optogenetics/"+subdir+"/", name.lower())
-    if val != name:
+    if not ut.strcmp(val, name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_optogen():
@@ -16,7 +16,7 @@ def test_general_optogen():
     create_general_optogen(fname)
     #
     val = ut.verify_present(fname, "general/optogenetics/", "optogen_custom")
-    if val != "OPTOGEN_CUSTOM":
+    if not ut.strcmp(val, "OPTOGEN_CUSTOM"):
         ut.error("Checking custom", "Field value incorrect")
     #
 
@@ -27,7 +27,7 @@ def test_general_optogen():
     test_field(fname, "LAMBDA", "p1")
     test_field(fname, "LOCATION", "p1")
     val = ut.verify_present(fname, "general/optogenetics/p1/", "optogen_site_custom") 
-    if val != "OPTOGEN_SITE_CUSTOM":
+    if not ut.strcmp(val, "OPTOGEN_SITE_CUSTOM"):
         ut.error("Checking metadata", "field value incorrect")
 
 

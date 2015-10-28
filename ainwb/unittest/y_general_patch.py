@@ -7,7 +7,7 @@ import test_utils as ut
 
 def test_field(fname, name, subdir):
     val = ut.verify_present(fname, "general/intracellular_ephys/"+subdir+"/", name.lower())
-    if val != name:
+    if not ut.strcmp(val, name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_intra():
@@ -16,7 +16,7 @@ def test_general_intra():
     create_general_intra(fname)
     #
     val = ut.verify_present(fname, "general/intracellular_ephys/", "intra_custom")
-    if val != "INTRA_CUSTOM":
+    if not ut.strcmp(val, "INTRA_CUSTOM"):
         ut.error("Checking custom", "Field value incorrect")
     #
 

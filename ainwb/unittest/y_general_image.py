@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import nwb
+import numpy as np
 from nwb.nwbco import *
 import test_utils as ut
 
@@ -7,7 +8,7 @@ import test_utils as ut
 
 def test_field(fname, name, subdir):
     val = ut.verify_present(fname, "general/optophysiology/"+subdir+"/", name.lower())
-    if val != name:
+    if val != name and val != np.bytes_(name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_intra():
@@ -16,7 +17,8 @@ def test_general_intra():
     create_general_intra(fname)
     #
     val = ut.verify_present(fname, "general/optophysiology/", "image_custom")
-    if val != "IMAGE_CUSTOM":
+    if not ut.strcmp(val, "IMAGE_CUSTOM"):
+    #if val != "IMAGE_CUSTOM" and val != b"IMAGE_CUSTOM":
         ut.error("Checking custom", "Field value incorrect")
     #
 
@@ -31,16 +33,16 @@ def test_general_intra():
     if len(val) != 2 or len(val[0]) != 2 or len(val[0][0]) != 3:
         ut.error("Checking manifold", "Incorrect dimensions")
     val = ut.verify_present(fname, "general/optophysiology/p1/red/", "description")
-    if val != "DESCRIPTION":
+    if not ut.strcmp(val, "DESCRIPTION"):
         ut.error("Checking metadata", "field value incorrect")
     val = ut.verify_present(fname, "general/optophysiology/p1/green/", "description")
-    if val != "DESCRIPTION":
+    if not ut.strcmp(val, "DESCRIPTION"):
         ut.error("Checking metadata", "field value incorrect")
     val = ut.verify_present(fname, "general/optophysiology/p1/red/", "emission_lambda")
-    if val != "CHANNEL_LAMBDA":
+    if not ut.strcmp(val, "CHANNEL_LAMBDA"):
         ut.error("Checking metadata", "field value incorrect")
     val = ut.verify_present(fname, "general/optophysiology/p1/green/", "emission_lambda")
-    if val != "CHANNEL_LAMBDA":
+    if not ut.strcmp(val, "CHANNEL_LAMBDA"):
         ut.error("Checking metadata", "field value incorrect")
 
 

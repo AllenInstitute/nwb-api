@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import nwb
+import numpy as np
 from nwb.nwbco import *
 import test_utils as ut
 
@@ -7,7 +8,7 @@ import test_utils as ut
 
 def test_field(fname, name, subdir):
     val = ut.verify_present(fname, "general/extracellular_ephys/"+subdir+"/", name.lower())
-    if val != name:
+    if val != name and val != np.bytes_(name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_extra():
@@ -22,19 +23,21 @@ def test_general_extra():
     val = ut.verify_present(fname, "general/extracellular_ephys", "electrode_group")
     if len(val) != 2:
         ut.error("Checking electrode group", "incorrect dimensions")
-    if val[0] != "p1" or val[1] != "p2":
-        ut.error("Checking electrode group", "incorrect values")
+    if val[0] != "p1" and val[0] != b"p1":
+        ut.error("Checking electrode group p1", "incorrect values")
+    if val[1] != "p2" and val[1] != b"p2":
+        ut.error("Checking electrode group p2", "incorrect values")
     #
     val = ut.verify_present(fname, "general/extracellular_ephys", "impedance")
     if len(val) != 2:
         ut.error("Checking electrode impedance", "incorrect dimensions")
     #
     val = ut.verify_present(fname, "general/extracellular_ephys/", "filtering")
-    if val != "EXTRA_FILTERING":
+    if val != "EXTRA_FILTERING" and val != b"EXTRA_FILTERING":
         ut.error("Checking filtering", "Field value incorrect")
     #
     val = ut.verify_present(fname, "general/extracellular_ephys/", "EXTRA_CUSTOM")
-    if val != "EXTRA_CUSTOM":
+    if val != "EXTRA_CUSTOM" and val != b"EXTRA_CUSTOM":
         ut.error("Checking custom", "Field value incorrect")
     #
 

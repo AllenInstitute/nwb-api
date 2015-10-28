@@ -7,7 +7,7 @@ import test_utils as ut
 
 def test_field(fname, name):
     val = ut.verify_present(fname, "general/subject/", name.lower())
-    if val != name:
+    if ut.strcmp(val, name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_subject():
@@ -15,7 +15,7 @@ def test_general_subject():
     fname = "x" + __file__[3:-3] + ".nwb"
     create_general_subject(fname)
     val = ut.verify_present(fname, "general/subject/", "description")
-    if val != "SUBJECT":
+    if ut.strcmp(val, "SUBJECT"):
         ut.error("Checking metadata", "field value incorrect")
     test_field(fname, "SUBJECT_ID")
     test_field(fname, "SPECIES")

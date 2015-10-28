@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import nwb
+import numpy as np
 from nwb.nwbco import *
 import test_utils as ut
 
@@ -9,7 +10,7 @@ import test_utils as ut
 
 def test_field(fname, name):
     val = ut.verify_present(fname, "general/", name.lower())
-    if val != name:
+    if val != name and val != np.bytes_(name):
         ut.error("Checking metadata", "field value incorrect")
 
 def test_general_top():
@@ -34,7 +35,7 @@ def test_general_top():
     if len(val) < 1000:
         ut.error("Checking metadata_from_file", "unexpected field size")
     val = ut.verify_attribute_present(fname, "general/source_script", "neurodata_type")
-    if val != "Custom":
+    if val != "Custom" and val != b"Custom":
         ut.error("Checking custom tag", "neurodata_type incorrect")
 
 
