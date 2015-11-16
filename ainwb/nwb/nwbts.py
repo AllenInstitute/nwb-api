@@ -254,7 +254,7 @@ class TimeSeries(object):
 
                *conversion* (float) Multiplier necessary to convert elements in data[] to specified unit
 
-               *resolution* (float) Minimum meaningful distance between elements in data[] (e.g., the +/- range, quantal step size between values, etc)
+               *resolution* (float) Minimum meaningful distance between elements in data[] (e.g., the +/- range, quantal step size between values, etc). If unknown, store NaN
    
            Returns:
                *nothing*
@@ -438,7 +438,7 @@ class TimeSeries(object):
         if self.finalized:
             return
         from . import nwb
-        nwb.register_finalization(self.name, self.serial_num)
+        nwb.register_finalization(self.path + self.name, self.serial_num)
         # tell kernel about link so table of all links can be added to
         #   file at end
         if self.data_tgt_path_soft is not None:

@@ -49,7 +49,7 @@ from . import nwbmo
 
 VERS_MAJOR = 1
 VERS_MINOR = 0
-VERS_PATCH = 1
+VERS_PATCH = 2
 
 __version__ = "%d.%d.%d" % (VERS_MAJOR, VERS_MINOR, VERS_PATCH)
 FILE_VERSION_STR = "NWB-%s" % __version__
@@ -284,6 +284,7 @@ class NWB(object):
         import atexit
         atexit.register(self.close)
         self.is_open = True
+        self.error_flag = True
 
     # internal API function to process constructor arguments
     def read_arguments(self, **vargs):
@@ -337,6 +338,7 @@ class NWB(object):
             sys.exit(1)
 
     def fatal_error(self, msg):
+        self.error_flag = True
         print("Error: " + msg)
         print("Stack trace follows")
         print("-------------------")
@@ -446,6 +448,12 @@ class NWB(object):
             Returns:
                 Nothing
         """
+        # if fatal error flag set, don't both with cleaning things up
+        # quit gracefully quietly, otherwise errors here may mask 
+        #   previous real problems
+        if self.error_flag:
+            self.file_pointer.close()
+            return
         if not self.is_open:
             return
         self.is_open = False
@@ -923,6 +931,8 @@ class NWB(object):
             value = value.full_path()
         if isinstance(value, str):
             value = str(value)
+        if value is None:
+            self.fatal_error("Attempted to set 'None' value in field '%s' (from %s)" % (key, name))
         # get field definition
         if key not in spec:
             # custom field. make sure it's acceptable
@@ -1187,7 +1197,15 @@ class NWB(object):
                 except TypeError:
                     del varg["compression"]
                     del varg["chunks"]
-                    dset = grp.create_dataset(**varg)
+                    try:
+                        dset = grp.create_dataset(**varg)
+                    except Exception as e:
+                        print("Exception text: %s" % str(e))
+                        print("** Internal error **")
+                        print("Dataset: %s" + str(varg["name"]))
+                        print("Data follows.")
+                        print(varg["data"])
+                        raise
             else:
                 dset = grp.create_dataset(**varg)
         if "_attributes" in spec:
@@ -1204,6 +1222,14 @@ class NWB(object):
                         valatt = block["_datatype"]
                         if valatt == "str":
                             val = np.string_(val)
-                    dset.attrs[k] = val
+                    try:
+                        dset.attrs[k] = val
+                    except RuntimeError as re:
+                        print("Error storing attribute for field '%s'" % field)
+                        print(re)
+                        print("Value is: ")
+                        print("data size is %d" % (len(val)))
+                        print(val)
+                        raise
 
 

@@ -208,9 +208,6 @@ Stores voltage data recorded from intracellular current-clamp recordings. A corr
 | capacitance_compensation | set_value("capacitance_compensation", | Unit: Farads                                |
 | *(float)*                | ...)                                  |                                             |
 +--------------------------+---------------------------------------+---------------------------------------------+
-| resistance_compensation  | set_value("resistance_compensation",  | Unit: Ohms                                  |
-| *(float)*                | ...)                                  |                                             |
-+--------------------------+---------------------------------------+---------------------------------------------+
 | gain *(float)*           | set_value("gain", ...)                | Unit: Volt/Volt                             |
 +--------------------------+---------------------------------------+---------------------------------------------+
 

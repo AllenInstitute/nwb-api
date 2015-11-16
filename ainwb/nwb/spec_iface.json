@@ -357,16 +357,13 @@
           {
             "_datatype" : "uint16",
             "_description" : "2D int array listing pixels (x,y) that compose mask",
-            "_include" : "required",
-            "_attributes" :
-            {
-              "weight" :
-              {
-                "_datatype" : "f4",
-                "_description" : "Array listing weight of each pixel",
-                "_include" : "required"
-              }
-            }
+            "_include" : "required"
+          },
+          "pix_mask_weight" :
+          {
+            "_datatype" : "f4",
+            "_description" : "Relative weight (between 0 and 1) of each pixel in pix_mask",
+            "_include" : "required"
           },
           "roi_description" :
           {

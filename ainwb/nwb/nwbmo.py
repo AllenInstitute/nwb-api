@@ -664,7 +664,8 @@ class ImageSegmentation(Interface):
 
                 *pixel_list* (2D int array) array of [x,y] pixel values
 
-                *weights* (float array) array of pixel weights
+                *weights* (float array) array of pixel weights (use None
+                if all weights=1.0)
 
                 *width* (int) width of reference image, in pixels
 
@@ -674,7 +675,9 @@ class ImageSegmentation(Interface):
                 *nothing*
         """
         # create image out of pixel list
-        img = np.zeros((height, width))
+        img = np.zeros((height, width), dtype=np.float32)
+        if weights is None:
+            weights = np.zeros(len(pixel_list)) + 1.0;
         for i in range(len(pixel_list)):
             y = pixel_list[i][0]
             x = pixel_list[i][1]
@@ -714,7 +717,8 @@ class ImageSegmentation(Interface):
             self.nwb.fatal_error("Imaging plane %s already has ROI %s" % (plane, name))
         self.spec[plane][name] = copy.deepcopy(self.spec["<>"]["<>"])
         self.spec[plane][name]["pix_mask"]["_value"] = pixel_list
-        self.spec[plane][name]["pix_mask"]["_attributes"]["weight"]["_value"] = weights
+        self.spec[plane][name]["pix_mask_weight"]["_value"] = weights
+        #self.spec[plane][name]["pix_mask"]["_attributes"]["weight"]["_value"] = weights
         self.spec[plane][name]["img_mask"]["_value"] = img
         self.spec[plane][name]["roi_description"]["_value"] = desc
         self.roi_list[plane].append(name)

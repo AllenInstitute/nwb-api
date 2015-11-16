@@ -1,0 +1,6 @@
+Note: Changes here are specific to the NWB library. Additional version
+changes are described in the file format specifications document
+
+Version 1.0.2
+Added check to see if a field value was set to None (error)
+Disabled automatic file close if error flag set
