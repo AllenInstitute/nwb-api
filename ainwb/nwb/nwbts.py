@@ -69,7 +69,7 @@ class TimeSeries(object):
         if self.path is not None:
             full_path = self.path + self.name
             if full_path in self.nwb.file_pointer:
-                self.fatal_error("group '%s' already exists" % full_path)
+                self.fatal_error("Group '%s' already exists" % full_path)
         self.time_tgt_path = None
         self.data_tgt_path = None
         self.data_tgt_path_soft = None

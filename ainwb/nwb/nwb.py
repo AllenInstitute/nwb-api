@@ -284,7 +284,25 @@ class NWB(object):
         import atexit
         atexit.register(self.close)
         self.is_open = True
-        self.error_flag = True
+        self.error_flag = False
+        # users may specify different spellings of dtypes than the library
+        #   expects. here's a table to handle conversions from some common
+        #   forms
+        self.dtype_glossary = {}
+        self.dtype_glossary["float32"] = 'f4'
+        self.dtype_glossary["float4"] = 'f4'
+        self.dtype_glossary["float64"] = 'f8'
+        self.dtype_glossary["float8"] = 'f8'
+        self.dtype_glossary["text"] = 'str'
+        self.dtype_glossary["i8"] = 'int64'
+        self.dtype_glossary["i4"] = 'int32'
+        self.dtype_glossary["i2"] = 'int16'
+        self.dtype_glossary["i1"] = 'int8'
+        self.dtype_glossary["u8"] = 'uint64'
+        self.dtype_glossary["u4"] = 'uint32'
+        self.dtype_glossary["u2"] = 'uint16'
+        self.dtype_glossary["u1"] = 'uint8'
+        self.dtype_glossary["byte"] = 'uint8'
 
     # internal API function to process constructor arguments
     def read_arguments(self, **vargs):
@@ -715,7 +733,6 @@ class NWB(object):
         if "_value" not in ts_defn["_attributes"]["ancestry"]:
             ts_defn["_attributes"]["ancestry"]["_value"] = []
         ts_defn["_attributes"]["ancestry"]["_value"] = ancestry
-        fp = self.file_pointer
         if ts_type == "AnnotationSeries":
             ts = nwbts.AnnotationSeries(name, modality, ts_defn, self)
         elif ts_type == "AbstractFeatureSeries":
@@ -931,8 +948,10 @@ class NWB(object):
             value = value.full_path()
         if isinstance(value, str):
             value = str(value)
-        if value is None:
-            self.fatal_error("Attempted to set 'None' value in field '%s' (from %s)" % (key, name))
+        if dtype is not None and type in self.dtype_glossary:
+            dtype = self.dtype_glossary[dtype]
+        if value is None and dtype is not None:
+            self.fatal_error("Attempted to set 'None' value in field '%s' (from %s) with no specified dtype" % (key, name))
         # get field definition
         if key not in spec:
             # custom field. make sure it's acceptable

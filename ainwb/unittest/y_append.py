@@ -37,7 +37,7 @@ def create_annotation_series(fname, name, target, newfile):
     neurodata = nwb.NWB(**settings)
     #
     annot = neurodata.create_timeseries("AnnotationSeries", name, target)
-    annot.set_description("This is an AnnotationSeries with sample data")
+    annot.set_description("This is an AnnotationSeries '%s' with sample data" % name)
     annot.set_comment("The comment and description fields can store arbitrary human-readable data")
     annot.set_source("Observation of Dr. J Doe")
     #
