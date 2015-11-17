@@ -33,10 +33,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 """
-import sys
 import copy
 import numpy as np
-import traceback
 
 class Module(object):
     """ Processing module. This is a container for one or more interfaces
@@ -136,8 +134,6 @@ class Module(object):
         if_spec = self.create_interface_definition(iface_type)
         if iface_type == "ImageSegmentation":
             iface = ImageSegmentation(iface_type, self, if_spec)
-        elif iface_type == "EventDetection":
-            iface = EventDetection(iface_type, self, if_spec)
         elif iface_type == "Clustering":
             iface = Clustering(iface_type, self, if_spec)
         elif iface_type == "UnitTimes":
@@ -147,8 +143,8 @@ class Module(object):
         else:
             iface = Interface(iface_type, self, if_spec)
         self.ifaces[iface_type] = iface
-        from . import nwb
-        iface.serial_num = nwb.register_creation("Interface -- " + iface_type)
+        from . import nwb as nwblib
+        iface.serial_num = nwblib.register_creation("Interface -- " + iface_type)
         return iface
 
     # internal function
@@ -157,8 +153,8 @@ class Module(object):
     def create_interface_definition(self, if_type):
         super_spec = copy.deepcopy(self.nwb.spec["Interface"]["SuperInterface"])
         if_spec = self.nwb.spec["Interface"][if_type]
-        from . import nwb
-        return nwb.recursive_dictionary_merge(super_spec, if_spec)
+        from . import nwb as nwblib
+        return nwblib.recursive_dictionary_merge(super_spec, if_spec)
 
     def set_description(self, desc):
         """ Set description field in module
@@ -187,7 +183,7 @@ class Module(object):
                *nothing*
         """
         if self.finalized:
-            nwb.fatal_error("Added value to module after finalization")
+            self.nwb.fatal_error("Added value to module after finalization")
         self.spec[key] = copy.deepcopy(self.spec["[]"])
         dtype = self.spec[key]["_datatype"]
         name = "module " + self.name
@@ -214,8 +210,8 @@ class Module(object):
         # write own data
         grp = self.nwb.file_pointer["processing/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
-        from . import nwb
-        nwb.register_finalization(self.name, self.serial_num)
+        from . import nwb as nwblib
+        nwblib.register_finalization(self.name, self.serial_num)
 
 
 class Interface(object):
@@ -297,9 +293,9 @@ class Interface(object):
         if self.finalized:
             self.nwb.fatal_error("Added value after finalization")
         if ts_name in self.defined_timeseries:
-            self.nwb.fatal_error("time series %s already defined" % ts.name)
+            self.nwb.fatal_error("time series %s already defined" % ts_name)
         if ts_name in self.linked_timeseries:
-            self.nwb.fatal_error("time series %s already defined" % ts.name)
+            self.nwb.fatal_error("time series %s already defined" % ts_name)
         self.linked_timeseries[ts_name] = path
 
     def set_source(self, src):
@@ -355,9 +351,10 @@ class Interface(object):
             self.fatal_error("Added value after finalization")
         # check type
         path = ""
-        if isinstance(value, TimeSeries):
+        from . import nwbts
+        if isinstance(value, nwbts.TimeSeries):
             path = value.full_path()
-        elif isinstance(value, nwbmo.Interface):
+        elif isinstance(value, Interface):
             path = value.full_path()
         elif isinstance(value, str):
             path = value
@@ -452,8 +449,8 @@ class Interface(object):
                 links = grp.attrs["timeseries_links"] + links
                 del grp.attrs["timeseries_links"]
             grp.attrs["timeseries_links"] = links
-        from . import nwb
-        nwb.register_finalization(self.module.name + "::" + self.name, self.serial_num)
+        from . import nwb as nwblib
+        nwblib.register_finalization(self.module.name + "::" + self.name, self.serial_num)
 
 ########################################################################
 
@@ -701,27 +698,28 @@ class ImageSegmentation(Interface):
         """
         # create pixel list out of image
         pixel_list = []
+        weights = []
         for y in range(len(img)):
             row = img[y]
             for x in range(len(row)):
                 if row[x] != 0:
                     pixel_list.append([x, y])
                     weights.append(row[x])
-        self.add_masks(image_plane, name, pixel_list, weights, img)
+        self.add_masks(image_plane, roi_name, pixel_list, weights, img)
 
     # internal function
-    def add_masks(self, plane, name, desc, pixel_list, weights, img):
+    def add_masks(self, plane, roi_name, desc, pixel_list, weights, img):
         if plane not in self.spec:
             self.nwb.fatal_error("Imaging plane %s not defined" % plane)
-        if name in self.spec[plane]:
-            self.nwb.fatal_error("Imaging plane %s already has ROI %s" % (plane, name))
-        self.spec[plane][name] = copy.deepcopy(self.spec["<>"]["<>"])
-        self.spec[plane][name]["pix_mask"]["_value"] = pixel_list
-        self.spec[plane][name]["pix_mask_weight"]["_value"] = weights
+        if roi_name in self.spec[plane]:
+            self.nwb.fatal_error("Imaging plane %s already has ROI %s" % (plane, roi_name))
+        self.spec[plane][roi_name] = copy.deepcopy(self.spec["<>"]["<>"])
+        self.spec[plane][roi_name]["pix_mask"]["_value"] = pixel_list
+        self.spec[plane][roi_name]["pix_mask_weight"]["_value"] = weights
         #self.spec[plane][name]["pix_mask"]["_attributes"]["weight"]["_value"] = weights
-        self.spec[plane][name]["img_mask"]["_value"] = img
-        self.spec[plane][name]["roi_description"]["_value"] = desc
-        self.roi_list[plane].append(name)
+        self.spec[plane][roi_name]["img_mask"]["_value"] = img
+        self.spec[plane][roi_name]["roi_description"]["_value"] = desc
+        self.roi_list[plane].append(roi_name)
 
     def finalize(self):
         if self.finalized:

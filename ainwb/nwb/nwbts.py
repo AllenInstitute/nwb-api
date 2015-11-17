@@ -35,10 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 import sys
 import traceback
-import h5py
 import copy
-import collections
-import numpy as np
 from . import nwbmo
 
 class TimeSeries(object):
@@ -437,8 +434,8 @@ class TimeSeries(object):
         """
         if self.finalized:
             return
-        from . import nwb
-        nwb.register_finalization(self.path + self.name, self.serial_num)
+        from . import nwb as nwblib
+        nwblib.register_finalization(self.path + self.name, self.serial_num)
         # tell kernel about link so table of all links can be added to
         #   file at end
         if self.data_tgt_path_soft is not None:

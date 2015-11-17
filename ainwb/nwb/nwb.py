@@ -39,7 +39,6 @@ import shutil
 import time
 import json
 import traceback
-import collections
 import h5py
 import copy
 import numpy as np
@@ -88,7 +87,6 @@ def recursive_dictionary_merge(x, y):
     return x
 
 def load_json(fname):
-    import json
     # correct the path, in case calling from remote directory
     fname = os.path.join( os.path.dirname(__file__), fname)
     try:
@@ -402,18 +400,18 @@ class NWB(object):
         self.hgen_dev = hgen.create_group("devices")
         #
         hacq = fp.create_group("acquisition")
-        hacq_seq = hacq.create_group("timeseries")
-        hacq_img = hacq.create_group("images")
+        hacq.create_group("timeseries")
+        hacq.create_group("images")
         #
         hstim = fp.create_group("stimulus")
-        hstim_temp = hstim.create_group("templates")
-        hstim_pres = hstim.create_group("presentation")
+        hstim.create_group("templates")
+        hstim.create_group("presentation")
         #
-        hepo = fp.create_group("epochs")
+        fp.create_group("epochs")
         #
-        hproc = fp.create_group("processing")
+        fp.create_group("processing")
         #
-        hana = fp.create_group("analysis")
+        fp.create_group("analysis")
 
 
     # internal function to open existing file for writing
@@ -927,12 +925,10 @@ class NWB(object):
                 # check for type conversion error
                 if isinstance(value, str):
                     raise ValueError
-                val = float(value)
             elif dtype.startswith('uint') or dtype.startswith('int'):
                 # check for type conversion error
                 if isinstance(value, str):
                     raise ValueError
-                val = int(value)
             elif dtype != "unspecified":
                 self.fatal_error("unexpected type: '%s'" % dtype)
         except ValueError:
@@ -950,8 +946,15 @@ class NWB(object):
             value = str(value)
         if dtype is not None and type in self.dtype_glossary:
             dtype = self.dtype_glossary[dtype]
-        if value is None and dtype is not None:
-            self.fatal_error("Attempted to set 'None' value in field '%s' (from %s) with no specified dtype" % (key, name))
+        if value is None:
+            if dtype is None:
+                self.fatal_error("Attempted to set 'None' value in field '%s' (from %s) with no specified dtype" % (key, name))
+            if dtype == 'f4' or dtype == 'f8':
+                value = float('nan')
+            elif dtype == 'str':
+                value = ""
+            else:
+                self.fatal_error("Don't know how to handle None value when dtype is integer")
         # get field definition
         if key not in spec:
             # custom field. make sure it's acceptable
@@ -1108,9 +1111,6 @@ class NWB(object):
         # create external link for this field
         file_path = spec["_value_softlink_file"]
         dataset_path = spec["_value_softlink"]
-        # store path so reader can know where dataset links to
-        link = file_path + "::" + dataset_path
-#        spec["_attributes"][field + "_link"]["_value"] = link
         # create external link
         if len(path) > 0:
             grp = grp[path]

@@ -33,10 +33,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 """
-import sys
 import copy
 import numpy as np
-import traceback
 from . import nwbts
 
 class Epoch(object):
@@ -75,7 +73,7 @@ class Epoch(object):
         # go ahead and create epoch folder now
         if self.name in nwb.file_pointer["epochs"]:
             nwb.fatal_error("Epoch %s already exists" % self.name)
-        epoch = nwb.file_pointer["epochs"].create_group(self.name)
+        nwb.file_pointer["epochs"].create_group(self.name)
         self.serial_num = -1
         self.finalized = False
 
@@ -103,7 +101,7 @@ class Epoch(object):
                *nothing*
         """
         if self.finalized:
-            nwb.fatal_error("Added value to epoch after finalization")
+            self.nwb.fatal_error("Added value to epoch after finalization")
         self.spec[key] = copy.deepcopy(self.spec["[]"])
         dtype = self.spec[key]["_datatype"]
         name = "epoch " + self.name
@@ -298,8 +296,8 @@ class Epoch(object):
         grp = self.nwb.file_pointer["epochs/" + self.name]
         self.nwb.write_datasets(grp, "", self.spec)
         #
-        from . import nwb
-        nwb.register_finalization(self.name, self.serial_num);
+        from . import nwb as nwblib
+        nwblib.register_finalization(self.name, self.serial_num);
         # flag ourself as done
         self.finalized = True
 
