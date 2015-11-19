@@ -22,6 +22,10 @@ python 3
      python3 setup.py install
 
 
+Primary contact information:
+    Keith Godfrey (keithg@alleninstitute.org) 
+    Rob Young (roby@alleninstitute.org).
+
 
 Project description
 ===================
