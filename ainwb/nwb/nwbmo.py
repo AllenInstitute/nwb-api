@@ -34,6 +34,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import copy
+import math
 import numpy as np
 
 class Module(object):
@@ -136,6 +137,8 @@ class Module(object):
             iface = ImageSegmentation(iface_type, self, if_spec)
         elif iface_type == "Clustering":
             iface = Clustering(iface_type, self, if_spec)
+        elif iface_type == "ISI_Retinotopy":
+            iface = ISI_Retinotopy(iface_type, self, if_spec)
         elif iface_type == "UnitTimes":
             iface = UnitTimes(iface_type, self, if_spec)
         elif iface_type == "MotionCorrection":
@@ -803,4 +806,41 @@ class MotionCorrection(Interface):
                 corrected.reset_name("corrected")
                 corrected.finalize()
         self.spec[name]["_attributes"]["links"]["_value"] = links
+
+
+class ISI_Retinotopy(Interface):
+    def __init__(self, name, module, spec):
+        super(ISI_Retinotopy, self).__init__(name, module, spec)
+        # make a table to store what ROIs are added to which planes
+        self.spec["axis_descriptions"]["_value"] = ["<undeclared>", "<undeclared>"]
+
+    def add_response_axis_1(self, response, axis_name, unit="degrees"):
+        self.spec["response_axis_1"]["_value"] = response
+        self.spec["response_axis_1"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_descriptions"]["_value"][0] = axis_name
+
+    def add_response_axis_2(self, response, axis_name, unit="degrees"):
+        self.spec["response_axis_2"]["_value"] = response
+        self.spec["response_axis_2"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_descriptions"]["_value"][1] = axis_name
+
+    def internal_add_image(self, name, img, bpp=None):
+        if bpp is None:
+            bpp = int(math.log(np.max(img), 2) + 1.0)
+        try:
+            dim1 = len(img)
+            dim2 = len(img[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for " + name)
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for " + name)
+        self.spec[name]["_value"] = img
+        self.spec[name]["_attributes"]["bits_per_pixel"]["_value"] = bpp
+        self.spec[name]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+
+    def add_vasculature_image(self, img, bpp=None):
+        self.internal_add_image("vasculature_image", img, bpp)
+
+    def add_focal_depth_image(self, img, bpp=None):
+        self.internal_add_image("focal_depth_image", img, bpp)
 
