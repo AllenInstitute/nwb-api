@@ -475,10 +475,16 @@
       "response_axis_1" :
       {
         "_datatype" : "f4",
-        "_description" : "Calculated ISI response on the first measured axis",
+        "_description" : "2D float array storing calculated ISI response on the first measured axis",
         "_include" : "required",
         "_attributes" :
         {
+          "dimension" :
+          {
+            "_datatype" : "int32",
+            "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
           "unit" :
           {
             "_datatype" : "str",
@@ -490,14 +496,35 @@
       "response_axis_2" :
       {
         "_datatype" : "f4",
-        "_description" : "Calculated ISI response on the second measured axis",
+        "_description" : "2D float array storing calculated ISI response on the second measured axis",
         "_include" : "required",
         "_attributes" :
         {
+          "dimension" :
+          {
+            "_datatype" : "int32",
+            "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
           "unit" :
           {
             "_datatype" : "str",
             "_description" : "Unit that axis data is stored in (e.g., 'degrees')",
+            "_include" : "required"
+          }
+        }
+      },
+      "sign_map" :
+      {
+        "_datatype" : "f4",
+        "_description" : "2D float array storing the sine of the angle between the direction of the gradient in axis 1 + axis 2",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "dimension" :
+          {
+            "_datatype" : "int32",
+            "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
             "_include" : "required"
           }
         }

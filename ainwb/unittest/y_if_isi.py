@@ -34,6 +34,16 @@ def test_image(fname, iname, img):
     if val != 8:
         ut.error("Checking image "+img+" bpp", "wrong contents")
 
+def test_sign_map(fname, iname):
+    val = ut.verify_present(fname, iname, "sign_map")
+    if len(val) != 2 or len(val[0]) != 3:
+        ut.error("Checking sign map", "wrong dimension")
+    if val[1][1] != -.5:
+        ut.error("Checking sign map", "wrong content")
+    val = ut.verify_attribute_present(fname, iname+"/sign_map", "dimension")
+    if len(val) != 2 or val[0] != 2 or val[1] != 3:
+        ut.error("Checking sign map dimension", "wrong contents")
+
 
 def test_isi_iface():
     if __file__.startswith("./"):
@@ -53,7 +63,11 @@ def test_isi_iface():
         ut.error("Checking axis_description", "wrong contents")
     test_image(fname, iname, "vasculature_image")
     test_image(fname, iname, "focal_depth_image")
+    test_sign_map(fname, iname)
 
+
+# TODO sign map
+# TODO dimension of response axes
 
 def create_isi_iface(fname, name):
     settings = {}
@@ -66,6 +80,7 @@ def create_isi_iface(fname, name):
     iface = module.create_interface("ISI_Retinotopy")
     iface.add_response_axis_1([[1.0, 1.1, 1.2],[2.0,2.1,2.2]], "altitude")
     iface.add_response_axis_2([[3.0, 3.1, 3.2],[4.0,4.1,4.2]], "azimuth", unit="degrees")
+    iface.add_sign_map([[-.1, .2, -.3],[.4,-.5,.6]])
     iface.add_vasculature_image([[1,0,129],[2,144,0]])
     iface.add_focal_depth_image([[1,0,129],[2,144,0]], 8)
     iface.finalize()

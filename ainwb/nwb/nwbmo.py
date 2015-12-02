@@ -818,11 +818,38 @@ class ISI_Retinotopy(Interface):
         self.spec["response_axis_1"]["_value"] = response
         self.spec["response_axis_1"]["_attributes"]["unit"]["_value"] = unit
         self.spec["axis_descriptions"]["_value"][0] = axis_name
+        try:
+            dim1 = len(response)
+            dim2 = len(response[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for axis_1")
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for axis_1")
+        self.spec["response_axis_1"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def add_response_axis_2(self, response, axis_name, unit="degrees"):
         self.spec["response_axis_2"]["_value"] = response
         self.spec["response_axis_2"]["_attributes"]["unit"]["_value"] = unit
         self.spec["axis_descriptions"]["_value"][1] = axis_name
+        try:
+            dim1 = len(response)
+            dim2 = len(response[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for axis_2")
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for axis_2")
+        self.spec["response_axis_2"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+
+    def add_sign_map(self, sign_map):
+        self.spec["sign_map"]["_value"] = sign_map
+        try:
+            dim1 = len(sign_map)
+            dim2 = len(sign_map[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for sign map")
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for sign map")
+        self.spec["sign_map"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def internal_add_image(self, name, img, bpp=None):
         if bpp is None:
