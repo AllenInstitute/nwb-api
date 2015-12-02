@@ -733,6 +733,8 @@ class ImageSegmentation(Interface):
         # continue with normal finalization
         super(ImageSegmentation, self).finalize()
 
+########################################################################
+
 class MotionCorrection(Interface):
     def add_corrected_image(self, name, orig, xy_translation, corrected):
         """ Adds a motion-corrected image to the module, including
@@ -807,6 +809,7 @@ class MotionCorrection(Interface):
                 corrected.finalize()
         self.spec[name]["_attributes"]["links"]["_value"] = links
 
+########################################################################
 
 class ISI_Retinotopy(Interface):
     def __init__(self, name, module, spec):
@@ -815,6 +818,20 @@ class ISI_Retinotopy(Interface):
         self.spec["axis_descriptions"]["_value"] = ["<undeclared>", "<undeclared>"]
 
     def add_response_axis_1(self, response, axis_name, unit="degrees"):
+        """ Adds calculated response along one of two measured axes
+
+            Arguments:
+                *response* (2D int array) Calculated ISI response to 
+                stimulus on the first measured axis
+
+                *axis_name* (text) Description of axis (e.g., "altitude", 
+                "azimuth", "radius", or "theta")
+
+                *unit* (text) SI unit of data
+
+            Returns:
+                *nothing*
+        """
         self.spec["response_axis_1"]["_value"] = response
         self.spec["response_axis_1"]["_attributes"]["unit"]["_value"] = unit
         self.spec["axis_descriptions"]["_value"][0] = axis_name
@@ -828,6 +845,20 @@ class ISI_Retinotopy(Interface):
         self.spec["response_axis_1"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def add_response_axis_2(self, response, axis_name, unit="degrees"):
+        """ Adds calculated response along one of two measured axes
+
+            Arguments:
+                *response* (2D int array) Calculated ISI response to 
+                stimulus on the second measured axis
+
+                *axis_name* (text) Description of axis (e.g., "altitude", 
+                "azimuth", "radius", or "theta")
+
+                *unit* (text) SI unit of data
+
+            Returns:
+                *nothing*
+        """
         self.spec["response_axis_2"]["_value"] = response
         self.spec["response_axis_2"]["_attributes"]["unit"]["_value"] = unit
         self.spec["axis_descriptions"]["_value"][1] = axis_name
@@ -841,6 +872,15 @@ class ISI_Retinotopy(Interface):
         self.spec["response_axis_2"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def add_sign_map(self, sign_map):
+        """ Adds sign (polarity) map to module
+
+            Arguments:
+                *sign_map* (2D float array) sine of the angle between the 
+                direction of the gradient in axis_1 and axis_2
+
+            Returns:
+                *nothing*
+        """
         self.spec["sign_map"]["_value"] = sign_map
         try:
             dim1 = len(sign_map)
@@ -866,8 +906,37 @@ class ISI_Retinotopy(Interface):
         self.spec[name]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def add_vasculature_image(self, img, bpp=None):
+        """ Anatomical image showing vasculature and cortical surface
+
+            Arguments:
+                *img* (2D float array) Gray-scale anatomical image 
+                of cortical surface. Array structure: [rows][columns]
+
+                *bpp* (int) Bits per pixel. This is necessary to determine
+                pixel value for "white". If no value is supplied, a 
+                calculation is performed to infer one
+
+            Returns:
+                *nothing*
+        """
         self.internal_add_image("vasculature_image", img, bpp)
 
     def add_focal_depth_image(self, img, bpp=None):
+        """ Adds "defocused" image taken at depth of imaging plane, using
+            same settings/parameters as acquired data (eg, wavelength,
+            depth)
+
+            Arguments:
+                *img* (2D float array) Gray-scale image taken with same 
+                settings/parameters as data collection. 
+                Array format: [rows][columns]
+
+                *bpp* (int) Bits per pixel. This is necessary to determine
+                pixel value for "white". If no value is supplied, a 
+                calculation is performed to infer one
+
+            Returns:
+                *nothing*
+        """
         self.internal_add_image("focal_depth_image", img, bpp)
 

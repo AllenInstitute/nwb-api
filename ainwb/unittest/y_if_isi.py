@@ -59,7 +59,7 @@ def test_isi_iface():
     val = ut.verify_present(fname, iname, "axis_descriptions")
     if len(val) != 2:
         ut.error("Checking axis_description", "wrong dimension")
-    if val[0] != "altitude" or val[1] != "azimuth":
+    if not ut.strcmp(val[0], "altitude") or not ut.strcmp(val[1], "azimuth"):
         ut.error("Checking axis_description", "wrong contents")
     test_image(fname, iname, "vasculature_image")
     test_image(fname, iname, "focal_depth_image")

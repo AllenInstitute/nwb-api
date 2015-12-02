@@ -284,7 +284,6 @@ class Epoch(object):
             ts = self.timeseries_dict[k]
             if k in epoch:
                 self.nwb.fatal_error("HDF5 object %s exists in epoch %s" % (k, self.name))
-            print "DEBUG epoch creating group: " + k
             ets = epoch.create_group(k)
             src = self.timeseries_dict[k]["timeseries"]
             ets["timeseries"] = fp[src]
