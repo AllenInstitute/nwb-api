@@ -462,9 +462,9 @@
         }
       }
     },
-    "ISI_Retinotopy" :
+    "Imaging_Retinotopy" :
     {
-      "_description" : "Intrinsic signal optical imaging for measuring retinotopy",
+      "_description" : "Intrinsic signal optical imaging or Widefield imaging for measuring retinotopy",
       "_include" : "optional",
       "axis_descriptions" :
       {
@@ -472,10 +472,10 @@
         "_description" : "Two-element array describing contents of the two response axis fields (e.g., ['azimuth','altitude'])",
         "_include" : "required"
       },
-      "response_axis_1" :
+      "axis_1_phase_map" :
       {
         "_datatype" : "f4",
-        "_description" : "2D float array storing calculated ISI response on the first measured axis",
+        "_description" : "2D float array storing phase response on the first measured axis",
         "_include" : "required",
         "_attributes" :
         {
@@ -483,6 +483,12 @@
           {
             "_datatype" : "int32",
             "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
             "_include" : "required"
           },
           "unit" :
@@ -493,7 +499,28 @@
           }
         }
       },
-      "response_axis_2" :
+      "axis_1_power_map" :
+      {
+        "_datatype" : "f4",
+        "_description" : "2D float array storing power of response on the first measured axis. Response is scaled so 0.0 is no power in the response and 1.0 is maximum relative power",
+        "_include" : "standard",
+        "_attributes" :
+        {
+          "dimension" :
+          {
+            "_datatype" : "int32",
+            "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "required"
+          }
+        }
+      },
+      "axis_2_phase_map" :
       {
         "_datatype" : "f4",
         "_description" : "2D float array storing calculated ISI response on the second measured axis",
@@ -506,11 +533,38 @@
             "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
             "_include" : "required"
           },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "required"
+          },
           "unit" :
           {
             "_datatype" : "str",
             "_description" : "Unit that axis data is stored in (e.g., 'degrees')",
             "_include" : "required"
+          }
+        }
+      },
+      "axis_2_power_map" :
+      {
+        "_datatype" : "f4",
+        "_description" : "2D float array storing power of response on the second measured axis. Response is scaled so 0.0 is no power in the response and 1.0 is maximum relative power",
+        "_include" : "standard",
+        "_attributes" :
+        {
+          "dimension" :
+          {
+            "_datatype" : "int32",
+            "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "standard"
           }
         }
       },

@@ -2,10 +2,10 @@
 import nwb
 import test_utils as ut
 
-# TESTS storage of ISI imaging data
+# TESTS storage of retonotopic imaging data
 
 def test_axis(fname, iname, num):
-    val = ut.verify_present(fname, iname, "response_axis_"+num)
+    val = ut.verify_present(fname, iname, "axis_"+num+"_phase_map")
     if len(val) != 2 or len(val[0]) != 3:
         ut.error("Checking axis-"+num, "wrong dimension")
     if num == "1": 
@@ -14,9 +14,26 @@ def test_axis(fname, iname, num):
     elif num == "2":
         if val[0][0] != 3.0:
             ut.error("Checking axis-"+num+" contents", "wrong contents")
-    val = ut.verify_attribute_present(fname, iname+"/response_axis_"+num, "unit")
+    val = ut.verify_attribute_present(fname, iname+"/axis_"+num+"_phase_map", "unit")
     if not ut.strcmp(val, "degrees"):
         ut.error("Checking axis-"+num+" unit", "Wrong value")
+    val = ut.verify_attribute_present(fname, iname+"/axis_"+num+"_phase_map", "dimension")
+    if val[0] != 2 or val[1] != 3:
+        ut.error("Double-checking axis-"+num+" dimension", "Wrong value")
+    val = ut.verify_attribute_present(fname, iname+"/axis_"+num+"_phase_map", "field_of_view")
+    if val[0] != .1 or val[1] != .1:
+        ut.error("Checking axis-"+num+" field-of-view", "Wrong value")
+    # now check power map. it only exists for axis 1
+    if num == "1":
+        val = ut.verify_present(fname, iname, "axis_"+num+"_phase_map")
+        if len(val) != 2 or len(val[0]) != 3:
+            ut.error("Checking axis-"+num+" power map", "wrong dimension")
+        val = ut.verify_attribute_present(fname, iname+"/axis_"+num+"_power_map", "dimension")
+        if val[0] != 2 or val[1] != 3:
+            ut.error("Double-checking axis-"+num+"-power dimension", "Wrong value")
+        val = ut.verify_attribute_present(fname, iname+"/axis_"+num+"_power_map", "field_of_view")
+        if val[0] != .1 or val[1] != .1:
+            ut.error("Checking axis-"+num+"-power field-of-view", "Wrong value")
 
 def test_image(fname, iname, img):
     val = ut.verify_present(fname, iname, img)
@@ -51,7 +68,7 @@ def test_isi_iface():
     else:
         fname = "x" + __file__[1:-3] + ".nwb"
     name = "test_module"
-    iname = "processing/" + name + "/ISI_Retinotopy"
+    iname = "processing/" + name + "/Imaging_Retinotopy"
     create_isi_iface(fname, name)
 
     test_axis(fname, iname, "1")
@@ -77,9 +94,10 @@ def create_isi_iface(fname, name):
     settings["description"] = "reference image test"
     neurodata = nwb.NWB(**settings)
     module = neurodata.create_module(name)
-    iface = module.create_interface("ISI_Retinotopy")
-    iface.add_response_axis_1([[1.0, 1.1, 1.2],[2.0,2.1,2.2]], "altitude")
-    iface.add_response_axis_2([[3.0, 3.1, 3.2],[4.0,4.1,4.2]], "azimuth", unit="degrees")
+    iface = module.create_interface("Imaging_Retinotopy")
+    iface.add_axis_1_phase_map([[1.0, 1.1, 1.2],[2.0,2.1,2.2]], "altitude", .1, .1)
+    iface.add_axis_2_phase_map([[3.0, 3.1, 3.2],[4.0,4.1,4.2]], "azimuth", .1, .1, unit="degrees")
+    iface.add_axis_1_power_map([[0.1, 0.2, 0.3],[0.4, 0.5, 0.6]], .1, .1)
     iface.add_sign_map([[-.1, .2, -.3],[.4,-.5,.6]])
     iface.add_vasculature_image([[1,0,129],[2,144,0]])
     iface.add_focal_depth_image([[1,0,129],[2,144,0]], 8)

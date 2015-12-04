@@ -137,8 +137,8 @@ class Module(object):
             iface = ImageSegmentation(iface_type, self, if_spec)
         elif iface_type == "Clustering":
             iface = Clustering(iface_type, self, if_spec)
-        elif iface_type == "ISI_Retinotopy":
-            iface = ISI_Retinotopy(iface_type, self, if_spec)
+        elif iface_type == "Imaging_Retinotopy":
+            iface = Imaging_Retinotopy(iface_type, self, if_spec)
         elif iface_type == "UnitTimes":
             iface = UnitTimes(iface_type, self, if_spec)
         elif iface_type == "MotionCorrection":
@@ -811,29 +811,34 @@ class MotionCorrection(Interface):
 
 ########################################################################
 
-class ISI_Retinotopy(Interface):
+class Imaging_Retinotopy(Interface):
     def __init__(self, name, module, spec):
-        super(ISI_Retinotopy, self).__init__(name, module, spec)
+        super(Imaging_Retinotopy, self).__init__(name, module, spec)
         # make a table to store what ROIs are added to which planes
         self.spec["axis_descriptions"]["_value"] = ["<undeclared>", "<undeclared>"]
 
-    def add_response_axis_1(self, response, axis_name, unit="degrees"):
-        """ Adds calculated response along one of two measured axes
+    def add_axis_1_phase_map(self, response, axis_name, width, height, unit="degrees"):
+        """ Adds calculated response along first measured axes
 
             Arguments:
-                *response* (2D int array) Calculated ISI response to 
+                *response* (2D int array) Calculated phase response to 
                 stimulus on the first measured axis
 
                 *axis_name* (text) Description of axis (e.g., "altitude", 
                 "azimuth", "radius", or "theta")
+
+                *width* (float) Field of view width, in meters
+
+                *height* (float) Field of view height, in meters
 
                 *unit* (text) SI unit of data
 
             Returns:
                 *nothing*
         """
-        self.spec["response_axis_1"]["_value"] = response
-        self.spec["response_axis_1"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_1_phase_map"]["_value"] = response
+        self.spec["axis_1_phase_map"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_1_phase_map"]["_attributes"]["field_of_view"]["_value"] = [height, width]
         self.spec["axis_descriptions"]["_value"][0] = axis_name
         try:
             dim1 = len(response)
@@ -842,13 +847,46 @@ class ISI_Retinotopy(Interface):
                 self.nwb.fatal_error("Invalid image dimensions for axis_1")
         except:
             self.nwb.fatal_error("Error calculating image dimensions for axis_1")
-        self.spec["response_axis_1"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+        self.spec["axis_1_phase_map"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
-    def add_response_axis_2(self, response, axis_name, unit="degrees"):
+    def add_axis_1_power_map(self, power_map, width=None, height=None):
+        """ Adds power of response along first measured axes
+
+            Arguments:
+                *power_map* (2D int array) Calculated power response to 
+                stimulus on the first measured axis. All values in power
+                map should be on the interval [0, 1]
+
+                *width* (float) Field of view width, in meters
+
+                *height* (float) Field of view height, in meters
+
+            Returns:
+                *nothing*
+        """
+        if power_map is None:    # ignore empty requests
+            return
+        if np.max(power_map) > 1.0 or np.min(power_map) < 0.0:
+            self.nwb.fatal_error("Power map requires relative power values, on the range >=0 and <=1.0")
+        self.spec["axis_1_power_map"]["_value"] = power_map
+        if height is not None and width is not None:
+            self.spec["axis_1_power_map"]["_attributes"]["field_of_view"]["_value"] = [height, width]
+        elif height is not None or width is not None:
+            self.nwb.fatal_error("Must specify both width and height if specifying either")
+        try:
+            dim1 = len(power_map)
+            dim2 = len(power_map[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for axis_1")
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for axis_1")
+        self.spec["axis_1_power_map"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+
+    def add_axis_2_phase_map(self, response, axis_name, width, height, unit="degrees"):
         """ Adds calculated response along one of two measured axes
 
             Arguments:
-                *response* (2D int array) Calculated ISI response to 
+                *response* (2D int array) Calculated phase response to 
                 stimulus on the second measured axis
 
                 *axis_name* (text) Description of axis (e.g., "altitude", 
@@ -859,8 +897,9 @@ class ISI_Retinotopy(Interface):
             Returns:
                 *nothing*
         """
-        self.spec["response_axis_2"]["_value"] = response
-        self.spec["response_axis_2"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_2_phase_map"]["_value"] = response
+        self.spec["axis_2_phase_map"]["_attributes"]["unit"]["_value"] = unit
+        self.spec["axis_2_phase_map"]["_attributes"]["field_of_view"]["_value"] = [height, width]
         self.spec["axis_descriptions"]["_value"][1] = axis_name
         try:
             dim1 = len(response)
@@ -869,7 +908,40 @@ class ISI_Retinotopy(Interface):
                 self.nwb.fatal_error("Invalid image dimensions for axis_2")
         except:
             self.nwb.fatal_error("Error calculating image dimensions for axis_2")
-        self.spec["response_axis_2"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+        self.spec["axis_2_phase_map"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
+
+    def add_axis_2_power_map(self, power_map, width=None, height=None):
+        """ Adds power of response along second measured axes
+
+            Arguments:
+                *power_map* (2D int array) Calculated power response to 
+                stimulus on the second measured axis. All values in power
+                map should be on the interval [0, 1]
+
+                *width* (float) Field of view width, in meters
+
+                *height* (float) Field of view height, in meters
+
+            Returns:
+                *nothing*
+        """
+        if power_map is None:    # ignore empty requests
+            return
+        if np.max(power_map) > 1.0 or np.min(power_map) < 0.0:
+            self.nwb.fatal_error("Power map requires relative power values, on the range >=0 and <=1.0")
+        self.spec["axis_2_power_map"]["_value"] = power_map
+        if height is not None and width is not None:
+            self.spec["axis_2_power_map"]["_attributes"]["field_of_view"]["_value"] = [height, width]
+        elif height is not None or width is not None:
+            self.nwb.fatal_error("Must specify both width and height if specifying either")
+        try:
+            dim1 = len(power_map)
+            dim2 = len(power_map[0])
+            if dim1 == 0 or dim2 == 0:
+                self.nwb.fatal_error("Invalid image dimensions for axis_2")
+        except:
+            self.nwb.fatal_error("Error calculating image dimensions for axis_2")
+        self.spec["axis_2_power_map"]["_attributes"]["dimension"]["_value"] = [dim1, dim2]
 
     def add_sign_map(self, sign_map):
         """ Adds sign (polarity) map to module
