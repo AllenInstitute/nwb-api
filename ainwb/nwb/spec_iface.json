@@ -575,6 +575,12 @@
         "_include" : "required",
         "_attributes" :
         {
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "required"
+          },
           "dimension" :
           {
             "_datatype" : "int32",
@@ -603,6 +609,12 @@
             "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
             "_include" : "required"
           },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "required"
+          },
           "bits_per_pixel" :
           {
             "_datatype" : "int32",
@@ -629,6 +641,18 @@
           {
             "_datatype" : "int32",
             "_description" : "Int array storing number of rows and columns in the image. NOTE: row,column representation is equivalent to height,width",
+            "_include" : "required"
+          },
+          "field_of_view" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
+            "_include" : "required"
+          },
+          "focal_depth" :
+          {
+            "_datatype" : "float",
+            "_description" : "float array storing the height and width of the imaging area, in meters",
             "_include" : "required"
           },
           "bits_per_pixel" :
