@@ -434,6 +434,30 @@ class TimeSeries(object):
         """
         if self.finalized:
             return
+        # verify path is in acceptable location
+        valid_loc = False   # ever the pessimest
+        if self.path.startswith("/acquisition/timeseries"):
+            valid_loc = True
+        elif self.path.startswith("/stimulus/templates"):
+            valid_loc = True
+        elif self.path.startswith("/stimulus/presentation"):
+            valid_loc = True
+        elif self.path.startswith("/analysis"):
+            valid_loc = True
+        elif self.path.startswith("/processing") and len(self.path) > len("/processing/"):
+            valid_loc = True
+        if not valid_loc:
+            print("Timeseries '%s' is not stored in a correct location" % self.name)
+            print("Specified path is '%s'" % self.path)
+            print("Possible solutions:")
+            print("1) when creating the time series, specify modality='acquisition', ")
+            print("   'stimulus' or 'template' and the path will be correctly")
+            print("   assigned")
+            print("2) add the time series to a processing module")
+            print("3) manually assign a valid directory in '/acquisition/',")
+            print("   'stimulus', 'processing' or 'analysis' folders")
+            self.nwb.fatal_error("Invalid TimeSeries path")
+        
         from . import nwb as nwblib
         nwblib.register_finalization(self.path + self.name, self.serial_num)
         # tell kernel about link so table of all links can be added to
