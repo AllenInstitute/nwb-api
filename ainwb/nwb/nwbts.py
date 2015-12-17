@@ -438,13 +438,23 @@ class TimeSeries(object):
         valid_loc = False   # ever the pessimest
         if self.path.startswith("/acquisition/timeseries"):
             valid_loc = True
+        elif self.path.startswith("acquisition/timeseries"):
+            valid_loc = True
         elif self.path.startswith("/stimulus/templates"):
+            valid_loc = True
+        elif self.path.startswith("stimulus/templates"):
             valid_loc = True
         elif self.path.startswith("/stimulus/presentation"):
             valid_loc = True
+        elif self.path.startswith("stimulus/presentation"):
+            valid_loc = True
         elif self.path.startswith("/analysis"):
             valid_loc = True
+        elif self.path.startswith("analysis"):
+            valid_loc = True
         elif self.path.startswith("/processing") and len(self.path) > len("/processing/"):
+            valid_loc = True
+        elif self.path.startswith("processing") and len(self.path) > len("processing/"):
             valid_loc = True
         if not valid_loc:
             print("Timeseries '%s' is not stored in a correct location" % self.name)
