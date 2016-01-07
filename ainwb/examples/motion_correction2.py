@@ -8,6 +8,7 @@ from nwb.nwbco import *
 
 """ 
 An example of using the MotionCorrection interface
+This example is based on two 2P cameras
 
 Modules and interfaces address intermediate processing of experimental
 data. Intermediate processing is processing that's necessary to
@@ -35,13 +36,13 @@ A third time series is created pointing to the corrected image.
 # several settings are specified when doing so. these can be supplied within
 #   the NWB constructor or defined in a dict, as in in this example
 settings = {}
-settings["filename"] = "sample_motion_correction.nwb"
+settings["filename"] = "sample_motion_correction_2.nwb"
 
 # each file should have a descriptive globally unique identifier 
 #   that specifies the lab and this experiment session
 # the function nwb.create_identifier() is recommended to use as it takes
 #   the string and appends the present date and time
-settings["identifier"] = nwb.create_identifier("motion correction example")
+settings["identifier"] = nwb.create_identifier("motion correction example 2")
 
 # indicate that it's OK to overwrite exting file
 settings["overwrite"] = True
@@ -53,7 +54,7 @@ settings["start_time"] = "Sat Jul 04 2015 3:14:16"
 
 # provide one or two sentences that describe the experiment and what
 #   data is in the file
-settings["description"] = "Test file demonstrating use of the MotionCorrection interface"
+settings["description"] = "Test file demonstrating use of the MotionCorrection interface with two cameras"
 
 # create the NWB object. this manages the file
 print("Creating " + settings["filename"])
@@ -65,29 +66,48 @@ neurodata = nwb.NWB(**settings)
 #   in the general metadata section. define that metadata here
 # the metadata fields (all caps) are defined in nwbco
 # 
-# define the recording device
-neurodata.set_metadata(DEVICE("Acme 2-photon microscope"), "Information about device goes here")
+# define the recording devices. In this example we assume Alice is 
+#   running camera 1 and Bob is running camera 2
+
+# camera number 1
+neurodata.set_metadata(DEVICE("Alice's Acme 2-photon microscope"), "Information about device goes here")
 # declare information about a particular site and/or imaging plane
 neurodata.set_metadata(IMAGE_SITE_EXCITATION_LAMBDA("camera1"), "1000 nm") 
 neurodata.set_metadata(IMAGE_SITE_INDICATOR("camera1"), "GCaMP6s") 
-neurodata.set_metadata(IMAGE_SITE_DEVICE("camera1"), "Acme 2-photon microscope") 
+neurodata.set_metadata(IMAGE_SITE_DEVICE("camera1"), "Alice's Acme 2-photon microscope") 
+
+# camera number 2
+neurodata.set_metadata(DEVICE("Bob's Acme 2-photon microscope"), "Information about device goes here")
+# declare information about a particular site and/or imaging plane
+neurodata.set_metadata(IMAGE_SITE_EXCITATION_LAMBDA("camera2"), "1000 nm") 
+neurodata.set_metadata(IMAGE_SITE_INDICATOR("camera2"), "GCaMP6s") 
+neurodata.set_metadata(IMAGE_SITE_DEVICE("camera2"), "Bob's Acme 2-photon microscope") 
+
 ########################################################################
 # create different examples of image series
 # image can be stored directly, for example by reading a .tif file into
 #   memory and storing this data as a byte stream in data[]
 # most(all?) examples here will have the time series reference data
 #   that is stored externally in the file system
+#
+# this example uses 2 cameras. the image stacks and motion-corrected data
+#   is stored independently for each camera. the code for storing data from
+#   camera 2 is almost identical to that of camera 1 in this example
 
+#################################
+#################################
+# camera 1
+# 
 # first, a simple image. this could be a simple ImageSeries. in this
 #   example we're using a TwoPhotonSeries, which is an ImageSeries
 #   with some extra data fields
-orig = neurodata.create_timeseries("TwoPhotonSeries", "source image", "acquisition")
+orig = neurodata.create_timeseries("TwoPhotonSeries", "Alice's source image", "acquisition")
 orig.set_description("Pointer to a 640x480 image stored in the file system")
-orig.set_source("Data acquired from Acme 2-photon microscope")
+orig.set_source("Data acquired from Alice's Acme 2-photon microscope")
 # assume the file is stored externally in the file system
 orig.set_value("format", "external")
 # specify the file
-orig.set_value("external_file", "/path/to/file/stack.tif")
+orig.set_value("external_file", "/path/to/file/alice_stack.tif")
 # information about the image
 orig.set_value("bits_per_pixel", 16)
 orig.set_value("dimension", [640, 480])
@@ -137,7 +157,7 @@ corr = neurodata.create_timeseries("ImageSeries", "corrected_image")
 corr.set_description("Corrected image")
 corr.set_comments("Motion correction calculated manually in photoshop")
 corr.set_value("format", "external")
-corr.set_value("external_file", "/path/to/file/corrected_stack.tif")
+corr.set_value("external_file", "/path/to/file/corrected_alice_stack.tif")
 corr.set_value("bits_per_pixel", 16)
 corr.set_value("dimension", [640, 480])
 corr.set_time_as_link(orig)
@@ -145,9 +165,8 @@ corr.set_value("num_samples", 3)
 corr.ignore_data()
 #corr.finalize()    DO NOT finalize -- interface takes care of this
 
-
 # create the module and MotionCorrection interface
-mod = neurodata.create_module("my module")
+mod = neurodata.create_module("Alice")
 # the module can store as many interfaces as we like. in this case we 
 #   only have one. create it
 iface = mod.create_interface("MotionCorrection")
@@ -164,7 +183,7 @@ iface.add_corrected_image("2photon", orig, xy, corr)
 # provide information in the interface about the source of the data
 iface.set_source(orig.full_path())
 
-iface.set_value("random comment", "Note that the 'original' field under 2photon is an HDF5 link to the time series '/acquisition/timeseries/source image'")
+iface.set_value("random comment", "Note that the 'original' field under 2photon is an HDF5 link to the time series '/acquisition/timeseries/Alice's source image'")
 
 # finish off the interface
 iface.finalize()
@@ -172,6 +191,93 @@ iface.finalize()
 # finish off the module
 mod.finalize()
 
+#################################
+#################################
+# camera 2
+# 
+# add image stack
+orig = neurodata.create_timeseries("TwoPhotonSeries", "Bob's source image", "acquisition")
+orig.set_description("Pointer to a 640x480 image stored in the file system")
+orig.set_source("Data acquired from Bob's Acme 2-photon microscope")
+# assume the file is stored externally in the file system
+orig.set_value("format", "external")
+# specify the file
+orig.set_value("external_file", "/path/to/file/bob_stack.tif")
+# information about the image
+orig.set_value("bits_per_pixel", 16)
+orig.set_value("dimension", [640, 480])
+###########################
+# TwoPhoton-specific fields
+orig.set_value("pmt_gain", 1.0)
+# field of view is in meters
+orig.set_value("field_of_view", [0.0003, 0.0003])
+# imaging plane value is the site/imaging-plane defined as metadata above
+orig.set_value("imaging_plane", "camera1")
+orig.set_value("scan_line_rate", 16000)
+###########################
+# store time -- this example has 3 frames
+orig.set_time([0, 1, 2])
+# there's no data to store in the NWB file as the data is in an image
+#   file in the file system
+orig.ignore_data()
+# when we ignore data, we must explicitly set number of samples (this is
+#   otherwise handled automatically)
+orig.set_value("num_samples", 3)
+# this is simulated acquired data
+# finish the time series so data is written to disk
+orig.finalize()
+
+# this example is for storing motion corrected 2-photon images
+# store the pixel delta for each frame in the source stack
+xy = neurodata.create_timeseries("TimeSeries", "x,y adjustments")
+xy.set_description("X,Y adjustments to original image necessary for registration")
+xy.set_data([[1.23, -3.45], [3.14, 2.18], [-4.2, 1.35]], unit="pixels", conversion=1, resolution=1)
+xy.set_time_as_link(orig)
+# if you try to create a time series and a required field is absent, the
+#   API will give an error about the missing field (try commenting out 
+#   the line set_data(), set_time() or set_value("num_samples") to see this
+#   behavior in action
+xy.set_value("num_samples", 3)
+# 'xy' is motion corrected data and is part of the processing module
+# module time series are finalized by the module interface that they're
+#   added to, so don't do it here
+
+# the module interface also stores the corrected image. assume that
+#   it's in the file system too
+# NOTE the corrected image timeseries is added to the interface through
+#   the call add_corrected_image() below
+corr = neurodata.create_timeseries("ImageSeries", "corrected_image")
+corr.set_description("Corrected image")
+corr.set_comments("Motion correction calculated manually in GIMP")
+corr.set_value("format", "external")
+corr.set_value("external_file", "/path/to/file/corrected_bob_stack.tif")
+corr.set_value("bits_per_pixel", 16)
+corr.set_value("dimension", [640, 480])
+corr.set_time_as_link(orig)
+corr.set_value("num_samples", 3)
+corr.ignore_data()
+#corr.finalize()    DO NOT finalize -- interface takes care of this
+
+# create the module and MotionCorrection interface
+mod = neurodata.create_module("Bob")
+# the module can store as many interfaces as we like. in this case we 
+#   only have one. create it
+iface = mod.create_interface("MotionCorrection")
+# add the time series to the interface
+iface.add_corrected_image("2photon", orig, xy, corr)
+
+# provide information in the interface about the source of the data
+iface.set_source(orig.full_path())
+
+iface.set_value("a comment", "Note that the 'original' field under 2photon is an HDF5 link to the time series '/acquisition/timeseries/Bob's source image'")
+
+# finish off the interface
+iface.finalize()
+
+# finish off the module
+mod.finalize()
+
+#####################################################
 # when all data is entered, close the file
 neurodata.close()
 
