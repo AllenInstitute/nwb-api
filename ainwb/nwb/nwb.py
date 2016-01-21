@@ -944,7 +944,7 @@ class NWB(object):
             value = value.full_path()
         if isinstance(value, str):
             value = str(value)
-        if dtype is not None and type in self.dtype_glossary:
+        if dtype is not None and dtype in self.dtype_glossary:
             dtype = self.dtype_glossary[dtype]
         if value is None:
             if dtype is None:
