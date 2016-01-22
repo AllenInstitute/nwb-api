@@ -68,7 +68,7 @@ def test_isi_iface():
     else:
         fname = "x" + __file__[1:-3] + ".nwb"
     name = "test_module"
-    iname = "processing/" + name + "/Imaging_Retinotopy"
+    iname = "processing/" + name + "/ImagingRetinotopy"
     create_isi_iface(fname, name)
 
     test_axis(fname, iname, "1")
@@ -94,7 +94,7 @@ def create_isi_iface(fname, name):
     settings["description"] = "reference image test"
     neurodata = nwb.NWB(**settings)
     module = neurodata.create_module(name)
-    iface = module.create_interface("Imaging_Retinotopy")
+    iface = module.create_interface("ImagingRetinotopy")
     iface.add_axis_1_phase_map([[1.0, 1.1, 1.2],[2.0,2.1,2.2]], "altitude", .1, .1)
     iface.add_axis_2_phase_map([[3.0, 3.1, 3.2],[4.0,4.1,4.2]], "azimuth", .1, .1, unit="degrees")
     iface.add_axis_1_power_map([[0.1, 0.2, 0.3],[0.4, 0.5, 0.6]], .1, .1)

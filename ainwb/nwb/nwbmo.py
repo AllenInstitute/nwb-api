@@ -137,8 +137,8 @@ class Module(object):
             iface = ImageSegmentation(iface_type, self, if_spec)
         elif iface_type == "Clustering":
             iface = Clustering(iface_type, self, if_spec)
-        elif iface_type == "Imaging_Retinotopy":
-            iface = Imaging_Retinotopy(iface_type, self, if_spec)
+        elif iface_type == "ImagingRetinotopy":
+            iface = ImagingRetinotopy(iface_type, self, if_spec)
         elif iface_type == "UnitTimes":
             iface = UnitTimes(iface_type, self, if_spec)
         elif iface_type == "MotionCorrection":
@@ -811,9 +811,9 @@ class MotionCorrection(Interface):
 
 ########################################################################
 
-class Imaging_Retinotopy(Interface):
+class ImagingRetinotopy(Interface):
     def __init__(self, name, module, spec):
-        super(Imaging_Retinotopy, self).__init__(name, module, spec)
+        super(ImagingRetinotopy, self).__init__(name, module, spec)
         # make a table to store what ROIs are added to which planes
         self.spec["axis_descriptions"]["_value"] = ["<undeclared>", "<undeclared>"]
 

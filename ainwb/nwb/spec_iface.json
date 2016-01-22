@@ -462,7 +462,7 @@
         }
       }
     },
-    "Imaging_Retinotopy" :
+    "ImagingRetinotopy" :
     {
       "_description" : "Intrinsic signal optical imaging or Widefield imaging for measuring retinotopy",
       "_include" : "optional",
