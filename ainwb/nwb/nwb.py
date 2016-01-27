@@ -276,11 +276,11 @@ class NWB(object):
         self.ts_time_link_lists = {}
         # to track softlinks
         self.ts_time_softlinks = {}
-        # undocumented feature -- automatically close file on exit
-        # this is to avoid case where user forgets to call 'close()'
-        #   and can't figure out why resulting file is broken
-        import atexit
-        atexit.register(self.close)
+        ## undocumented feature -- automatically close file on exit
+        ## this is to avoid case where user forgets to call 'close()'
+        ##   and can't figure out why resulting file is broken
+        #import atexit
+        #atexit.register(self.close)
         self.is_open = True
         self.error_flag = False
         # users may specify different spellings of dtypes than the library
