@@ -679,9 +679,7 @@ class ImageSegmentation(Interface):
         if weights is None:
             weights = np.zeros(len(pixel_list)) + 1.0;
         for i in range(len(pixel_list)):
-            y = pixel_list[i][0]
-            x = pixel_list[i][1]
-            img[y][x] = weights[i]
+            img[pixel_list[i][1]][pixel_list[i][0]] = weights[i]
         self.add_masks(image_plane, roi_name, desc, pixel_list, weights, img)
 
     def add_roi_mask_img(self, image_plane, roi_name, desc, img):
