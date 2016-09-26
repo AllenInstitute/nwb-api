@@ -209,6 +209,7 @@ class Module(object):
         for k, v in self.ifaces.items():
             v.finalize()
             iface_names.append(v.name)
+        iface_names.sort()
         self.spec["_attributes"]["interfaces"]["_value"] = iface_names
         # write own data
         grp = self.nwb.file_pointer["processing/" + self.name]

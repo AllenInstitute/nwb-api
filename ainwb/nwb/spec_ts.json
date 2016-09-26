@@ -145,6 +145,12 @@
           "_description" : "List of all time series (paths) that have HDF5 links to the 'data' field",
           "_include" : "optional"
         },
+        "extern_fields" :
+        {
+          "_datatype" : "str",
+          "_description" : "List of all fields that are links to external files",
+          "_include" : "optional"
+        },
         "data_softlink" :
         {
           "_datatype" : "str",
@@ -198,8 +204,8 @@
 		"_attributes" :
 		{
 			"unit" : { "_value" : "n/a" },
-			"conversion" : { "_value" : "0" },
-			"resolution" : { "_value" : "0" }
+			"conversion" : { "_value" : 0 },
+			"resolution" : { "_value" : 0 }
 		}
       }
     },
@@ -214,8 +220,8 @@
 		"_attributes" :
 		{
 		  "unit" : { "_value" : "start/stop" },
-		  "conversion" : { "_value" : "1" },
-		  "resolution" : { "_value" : "1" }
+		  "conversion" : { "_value" : 1 },
+		  "resolution" : { "_value" : 1 }
 		}
       }
     },
@@ -442,8 +448,8 @@
 		"_attributes" :
 		{
 		  "unit" : { "_value" : "see 'feature_units'" },
-		  "conversion" : { "_value" : "1" },
-		  "resolution" : { "_value" : "0" }
+		  "conversion" : { "_value" : 1 },
+		  "resolution" : { "_value" : 0 }
 		}
       },
       "features" :

@@ -66,7 +66,7 @@ class Epoch(object):
         # reference to nwb 'kernel'
         self.nwb = nwb
         # intervals that are for ignoring data (eg, due noise)
-        self.spec["ignore_intervals"]["_value"] = []
+        #self.spec["ignore_intervals"]["_value"] = []
         # list of tags associated with epoch
         self.spec["_attributes"]["tags"]["_value"] = []
         self.spec["_attributes"]["links"]["_value"] = []
@@ -173,6 +173,8 @@ class Epoch(object):
             timeseries_path = timeseries
         else:
             self.nwb.fatal_error("Don't recognize timeseries parameter as time series or path")
+        if not timeseries_path.startswith('/'):
+            timeseries_path = '/' + timeseries_path
         epoch_ts["timeseries"] = timeseries_path
         #print timeseries_path
         if timeseries_path not in self.nwb.file_pointer:
@@ -195,6 +197,7 @@ class Epoch(object):
         self.timeseries_dict[in_epoch_name] = epoch_ts
         label = "'" + in_epoch_name + "' is '" + timeseries_path + "'"
         self.spec["_attributes"]["links"]["_value"].append(label)
+        self.spec["_attributes"]["links"]["_value"].sort()  # VALIDATOR
 
     # internal function
     # Finds the first element in *timestamps* that is >= *epoch_start*

@@ -27,7 +27,7 @@
 		{
 			"_datatype" : "f8",
 			"_description" : "Intervals in epoch that should be ignored (eg, due electrical noise)",
-			"_include" : "required"
+			"_include" : "optional"
 		},
         "[]" :
         {

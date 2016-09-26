@@ -48,7 +48,7 @@ from . import nwbmo
 
 VERS_MAJOR = 1
 VERS_MINOR = 0
-VERS_PATCH = 2
+VERS_PATCH = 5
 
 __version__ = "%d.%d.%d" % (VERS_MAJOR, VERS_MINOR, VERS_PATCH)
 FILE_VERSION_STR = "NWB-%s" % __version__
@@ -481,13 +481,15 @@ class NWB(object):
         # TODO check to see if data_link and timestamp_link exist
         for k, lst in self.ts_data_link_lists.items():
             for i in range(len(lst)):
-                self.file_pointer[lst[i]].attrs["data_link"] = np.string_(lst)
+                self.file_pointer[lst[i]].attrs["data_link"] = lst
+                #self.file_pointer[lst[i]].attrs["data_link"] = np.string_(lst) # VALIDATOR
         for k, lst in self.ts_time_link_lists.items():
             for i in range(len(lst)):
                 obj = self.file_pointer[lst[i]]
-                obj.attrs["timestamp_link"] = np.string_(lst)
-        for k, lnk in self.ts_time_softlinks.items():
-            self.file_pointer[k].attrs["data_softlink"] = np.string_(lnk)
+                obj.attrs["timestamp_link"] = lst
+                #obj.attrs["timestamp_link"] = np.string_(lst)
+        #for k, lnk in self.ts_time_softlinks.items():
+        #    self.file_pointer[k].attrs["data_softlink"] = np.string_(lnk)
         # TODO finalize all modules
         # finalize epochs and write epoch tag list to epoch group
         for i in range(len(self.epoch_list)):
@@ -1060,6 +1062,13 @@ class NWB(object):
                     print(type(attr[k]["_value"]))
                     print(len(attr[k]["_value"]))
                     raise
+                except ValueError:
+                    print("*** Value error ***")
+                    print("Attribute " + k)
+                    print(attr[k]["_value"])
+                    print(type(attr[k]["_value"]))
+                    print(len(attr[k]["_value"]))
+                    raise
 
     # internal API function to create a dataset in the specified path,
     #   relative to the specified group. dataset is described in spec
@@ -1125,7 +1134,16 @@ class NWB(object):
         #dataset_path = spec["_value_hardlink"] + "/" + field
         if len(path) > 0:
             grp = grp[path]
-        grp[field] = self.file_pointer[dataset_path]
+        if not dataset_path.startswith('/'):
+            dataset_path = "/" + dataset_path
+        #print("-------------")
+        #print("Writing link:")
+        #print("\tgrp: '%s'" % grp)
+        #print("\tpath: '%s'" % path)
+        #print("\tfield: '%s'" % field)
+        #print("\tfullpath: '%s'" % dataset_path)
+        grp[field] = h5py.SoftLink(dataset_path)
+        #grp[field] = self.file_pointer[dataset_path]
 
     def write_dataset_to_file(self, grp, path, field, spec):
         self.ensure_path(grp, path)

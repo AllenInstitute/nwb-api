@@ -136,7 +136,13 @@ class TimeSeries(object):
             path = value
         else:
             self.fatal_error("Unrecognized type for setting up link -- found %s" % type(value))
-        self.set_value(key, path)
+        # hack alert -- need to establish the definition for the field
+        # this is already done in set_value, but that also sets the "_value"
+        #   field. create the definition and then delete "_value" so the link
+        #   can be established
+        self.set_value(key, "dummy")
+        del self.spec[key]["_value"]
+        self.spec[key]["_value_hardlink"] = path
         self.set_value(key + "_path", path)
 
     # add a link to another NWB object
@@ -153,6 +159,10 @@ class TimeSeries(object):
             self.fatal_error("Dataset path must be string, received %s", type(dataset_path))
         # TODO set _value_softlink fields
         self.set_value(key, "????")
+        extern_fields = self.spec["_attributes"]["extern_fields"]
+        if "_value" not in extern_fields:
+            extern_fields["_value"] = []
+        extern_fields["_value"].append(key)
         self.set_value(key + "_link", target_file + "::" + dataset_path)
 
     # internal function used for setting data[] and timestamps[]
@@ -353,6 +363,10 @@ class TimeSeries(object):
         #   store link info for finalization, when path is known
         self.data_tgt_path_soft = file_path + "://" + dataset_path
         #self.nwb.record_timeseries_data_soft_link(self.full_path(), file_path+"://"+dataset_path)
+        extern_fields = self.spec["_attributes"]["extern_fields"]
+        if "_value" not in extern_fields:
+            extern_fields["_value"] = []
+        extern_fields["_value"].append("data")
 
 
     # internal function
@@ -436,14 +450,17 @@ class TimeSeries(object):
             return
         # verify path is in acceptable location
         valid_loc = False   # ever the pessimest
+        template = False    
         if self.path.startswith("/acquisition/timeseries"):
             valid_loc = True
         elif self.path.startswith("acquisition/timeseries"):
             valid_loc = True
         elif self.path.startswith("/stimulus/templates"):
             valid_loc = True
+            template = True
         elif self.path.startswith("stimulus/templates"):
             valid_loc = True
+            template = True
         elif self.path.startswith("/stimulus/presentation"):
             valid_loc = True
         elif self.path.startswith("stimulus/presentation"):
@@ -480,6 +497,9 @@ class TimeSeries(object):
             self.nwb.record_timeseries_time_link(self.full_path(), self.time_tgt_path)
         # verify all mandatory fields are present
         spec = self.spec
+        if template:    # VALIDATOR
+            spec["timestamps"]["_include"] = "optional"
+            spec["starting_time"]["_include"] = "optional"
         # num_samples can sometimes be calculated automatically. do so
         #   here if that's possible
         if "_value" not in spec["num_samples"]:
@@ -540,6 +560,8 @@ class TimeSeries(object):
                         err_str.append("Missing attribute: " + k)
         # report missing standard data
         if len(missing_fields) > 0:
+            missing_fields.sort()
+            spec["_attributes"]["missing_fields"]["_value"].sort()
             print("Warning -- '%s' is missing the following:" % self.full_path())
             for i in range(len(missing_fields)):
                 print("\t" + missing_fields[i])

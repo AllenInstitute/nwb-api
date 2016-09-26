@@ -122,6 +122,8 @@ def IMAGE_SITE_DESCRIPTION(site):
     return "optophysiology/" + site + "/description"
 def IMAGE_SITE_MANIFOLD(site):
     return "optophysiology/" + site + "/manifold"
+def IMAGE_SITE_REFERENCE_FRAME(site):
+    return "optophysiology/" + site + "/reference_frame"
 def IMAGE_SITE_INDICATOR(site):
     return "optophysiology/" + site + "/indicator"
 def IMAGE_SITE_EXCITATION_LAMBDA(site):
