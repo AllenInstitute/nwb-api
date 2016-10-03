@@ -17,8 +17,6 @@ setup(
     name='nwb',
     version="1.0.0",#nwb.__version__,
     url='https://github.com/AllenInstitute/nwb-api',
-    author='Keith Godfrey',
-    author_email='keithg@alleninstitute.org',
     description='Allen Institute API for the NWB format',
     long_description = long_description,
 
